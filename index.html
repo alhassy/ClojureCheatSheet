@@ -1,0 +1,1460 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2021-01-12 Tue 10:44 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Clojure Reference Sheet</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Musa Al-hassy" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<style>  summary:hover {background:pink;} </style>
+        <style>
+        /* From: https://endlessparentheses.com/public/css/endless.css */
+        /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+        kbd
+        {
+          -moz-border-radius: 6px;
+          -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+          -webkit-border-radius: 6px;
+          -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+          background-color: #f7f7f7;
+          border: 1px solid #ccc;
+          border-radius: 6px;
+          box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+          color: #333;
+          display: inline-block;
+          font-family: 'Droid Sans Mono', monospace;
+          font-size: 80%;
+          font-weight: normal;
+          line-height: inherit;
+          margin: 0 .1em;
+          padding: .08em .4em;
+          text-shadow: 0 1px 0 #fff;
+          word-spacing: -4px;
+
+          box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+        }
+        </style>
+        <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+
+        <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+
+        <script type="text/javascript">
+            if (typeof jQuery == 'undefined') {
+                document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+            }
+        </script>
+
+         <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+
+          <script>
+                 $(document).ready(function() {
+                     $('.tooltip').tooltipster({
+                         theme: 'tooltipster-punk',
+                         contentAsHTML: true,
+                         animation: 'grow',
+                         delay: [100,500],
+                         // trigger: 'click'
+                         trigger: 'custom',
+                         triggerOpen: {
+                             mouseenter: true
+                         },
+                         triggerClose: {
+                             originClick: true,
+                             scroll: true
+                         }
+         });
+                 });
+             </script>
+
+        <style>
+           abbr {color: red;}
+
+           .tooltip { border-bottom: 1px dotted #000;
+                      color:red;
+                      text-decoration: none;}
+        </style>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Clojure Reference Sheet</h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p>
+<div class="header">
+  <a href="https://alhassy.github.io/" class="logo">Life & Computing Science</a>
+  <br>
+    <a href="https://alhassy.github.io/AlBasmala">AlBasmala</a>
+    <a href="https://alhassy.github.io/archive">Archive</a>
+    <a href="https://alhassy.github.io/tags">Tags</a>
+    <a href="https://alhassy.github.io/rss.xml">RSS</a>
+    <a href="https://alhassy.github.io/about">About</a>
+</div><style>  summary:hover {background:pink;} </style>
+        <style>
+        /* From: https://endlessparentheses.com/public/css/endless.css */
+        /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+        kbd
+        {
+          -moz-border-radius: 6px;
+          -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+          -webkit-border-radius: 6px;
+          -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+          background-color: #f7f7f7;
+          border: 1px solid #ccc;
+          border-radius: 6px;
+          box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+          color: #333;
+          display: inline-block;
+          font-family: 'Droid Sans Mono', monospace;
+          font-size: 80%;
+          font-weight: normal;
+          line-height: inherit;
+          margin: 0 .1em;
+          padding: .08em .4em;
+          text-shadow: 0 1px 0 #fff;
+          word-spacing: -4px;
+
+          box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+        }
+        </style>
+        <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+
+        <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+
+        <script type="text/javascript">
+            if (typeof jQuery == 'undefined') {
+                document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+            }
+        </script>
+
+         <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+
+          <script>
+                 $(document).ready(function() {
+                     $('.tooltip').tooltipster({
+                         theme: 'tooltipster-punk',
+                         contentAsHTML: true,
+                         animation: 'grow',
+                         delay: [100,500],
+                         // trigger: 'click'
+                         trigger: 'custom',
+                         triggerOpen: {
+                             mouseenter: true
+                         },
+                         triggerClose: {
+                             originClick: true,
+                             scroll: true
+                         }
+         });
+                 });
+             </script>
+
+        <style>
+           abbr {color: red;}
+
+           .tooltip { border-bottom: 1px dotted #000;
+                      color:red;
+                      text-decoration: none;}
+        </style>
+        <meta name="author" content="Musa Al-hassy">
+    <meta name="referrer" content="no-referrer"><link href="usual-org-front-matter.css" rel="stylesheet" type="text/css" /><link href="org-notes-style.css" rel="stylesheet" type="text/css" /><link href="floating-toc.css" rel="stylesheet" type="text/css" /><link href="blog-banner.css" rel="stylesheet" type="text/css" /><link rel="icon" href="images/favicon.png"><script type="text/javascript">
+   /*
+   @licstart  The following is the entire license notice for the
+   JavaScript code in this tag.
+
+   Copyright (C) 2012-2020 Free Software Foundation, Inc.
+
+   The JavaScript code in this tag is free software: you can
+   redistribute it and/or modify it under the terms of the GNU
+   General Public License (GNU GPL) as published by the Free Software
+   Foundation, either version 3 of the License, or (at your option)
+   any later version.  The code is distributed WITHOUT ANY WARRANTY;
+   without even the implied warranty of MERCHANTABILITY or FITNESS
+   FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+   As additional permission under GNU GPL version 3 section 7, you
+   may distribute non-source (e.g., minimized or compacted) forms of
+   that code without the copy of the GNU GPL normally required by
+   section 4, provided you include this license notice and a URL
+   through which recipients can access the Corresponding Source.
+
+
+   @licend  The above is the entire license notice
+   for the JavaScript code in this tag.
+   */
+   <!--/*--><![CDATA[/*><!--*/
+    function CodeHighlightOn(elem, id)
+    {
+      var target = document.getElementById(id);
+      if(null != target) {
+        elem.cacheClassElem = elem.className;
+        elem.cacheClassTarget = target.className;
+        target.className = "code-highlighted";
+        elem.className   = "code-highlighted";
+      }
+    }
+    function CodeHighlightOff(elem, id)
+    {
+      var target = document.getElementById(id);
+      if(elem.cacheClassElem)
+        elem.className = elem.cacheClassElem;
+      if(elem.cacheClassTarget)
+        target.className = elem.cacheClassTarget;
+    }
+   /*]]>*///-->
+   </script><link href="https://alhassy.github.io/org-notes-style.css" rel="stylesheet" type="text/css" /><link href="https://alhassy.github.io/floating-toc.css" rel="stylesheet" type="text/css" /><link href="https://alhassy.github.io/blog-banner.css" rel="stylesheet" type="text/css" /><br><center><h1>Clojure Reference Sheet</h1></center>
+</p>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#Primitive-Data-Structures">1. <a href="#Primitive-Data-Structures">Primitive Data Structures</a></a></li>
+<li><a href="#Sequence-Collection-Methods">2. <a href="#Sequence-Collection-Methods">Sequence &amp; Collection Methods</a></a>
+<ul>
+<li><a href="#The-Collection-Abstraction">2.1. <a href="#The-Collection-Abstraction">The Collection Abstraction</a></a></li>
+<li><a href="#The-Sequence-Abstraction">2.2. <a href="#The-Sequence-Abstraction">The Sequence Abstraction</a></a></li>
+</ul>
+</li>
+<li><a href="#Laziness-I-thunk-therefore-I'm-done">3. <a href="#Laziness-I-thunk-therefore-I'm-done">Laziness: “I <i>thunk</i>, therefore I'm done!”</a></a>
+<ul>
+<li><a href="#Memoize">3.1. <a href="#Memoize">Memoize</a></a></li>
+</ul>
+</li>
+<li><a href="#Conditionals">4. <a href="#Conditionals">Conditionals</a></a></li>
+<li><a href="#Block-of-Code-do-and-control-flow-and-or">5. <a href="#Block-of-Code-do-and-control-flow-and-or">Block of Code <code>do</code> and control flow <code>and, or</code></a></a></li>
+<li><a href="#Functions">6. <a href="#Functions">Functions</a></a>
+<ul>
+<li><a href="#Arity-Overloading">6.1. <a href="#Arity-Overloading">Arity Overloading</a></a></li>
+<li><a href="#Runtime-Polymorphism-Arbitrary-dispatch">6.2. <a href="#Runtime-Polymorphism-Arbitrary-dispatch">Runtime Polymorphism; Arbitrary dispatch</a></a></li>
+<li><a href="#You-can-also-destructure-parameters">6.3. <a href="#You-can-also-destructure-parameters">You can also <i>destructure</i> parameters</a></a></li>
+<li><a href="#Anonymous-functions">6.4. <a href="#Anonymous-functions">Anonymous functions</a></a></li>
+<li><a href="#Keyword-named-arguments">6.5. <a href="#Keyword-named-arguments">Keyword / named arguments</a></a></li>
+<li><a href="#Higher-order-functions">6.6. <a href="#Higher-order-functions">Higher order functions</a></a></li>
+</ul>
+</li>
+<li><a href="#Let-and-Loop">7. <a href="#Let-and-Loop">Let and Loop</a></a></li>
+<li><a href="#Quotes-Quasi-Quotes-and-Unquotes">8. <a href="#Quotes-Quasi-Quotes-and-Unquotes">Quotes, Quasi-Quotes, and Unquotes</a></a></li>
+<li><a href="#Macros">9. <a href="#Macros">Macros</a></a></li>
+</ul>
+</div>
+</div>
+
+
+<p>
+<i>Everything is a list!</i>
+</p>
+
+<ul class="org-ul">
+<li>Functions are first-class values; variables and functions share the same
+namespace &#x2014;“Clojure is a Lisp-1 Language”.</li>
+
+<li>To find out more about <code class="src src-clojure">name</code> execute
+<code class="src src-clojure">(doc name)</code>!</li>
+</ul>
+
+<p>
+For these notes, I followed the delightful <a href="https://www.braveclojure.com/foreword/">Clojure for the Brave and True</a>; I
+<a href="https://gist.github.com/yogthos/be323be0361c589570a6da4ccc85f58f">suggest</a> starting with <a href="http://clojurescriptkoans.com/">ClojureScript Koans</a>: An interactive question-answer
+approach where you type up (super small) code to progress ;-)
+</p>
+
+<div id="outline-container-Primitive-Data-Structures" class="outline-2">
+<h2 id="Primitive-Data-Structures"><span class="section-number-2">1</span> <a href="#Primitive-Data-Structures">Primitive Data Structures</a></h2>
+<div class="outline-text-2" id="text-Primitive-Data-Structures">
+<p>
+Use <code>def</code> to bind a name to a value &#x2014;this' like CommonLisp's <code>setq</code>.
+</p>
+
+<p>
+Clojure's data structures are all immutable; that cannot be changed in place.
+</p>
+
+<dl class="org-dl">
+<dt>Numbers</dt><dd>Integers, floats, ratios:
+<code class="src src-clojure">(printf <span style="color: #2aa198;">"%s and %s and %s"</span> -93 1.2 1/5)</code></dd>
+<dt>Symbols</dt><dd><p>
+Atomic literals, <code class="src src-clojure">'hello</code>. They're like
+numbers: <i>They are what they are!</i> Unlike strings, the idea is to treat these
+<i>literally</i> rather than operate on their ‘contents’. They're <i>first-class names!</i>
+</p>
+
+<p>
+Closely related, are <b>keywords</b>, such as <code class="src src-clojure"><span style="color: #6c71c4; font-weight: bold;">:hello</span></code>.
+In Clojure, these are <i>not</i> symbols since they always evaluate to themselves
+and cannot act as names.
+</p>
+
+<p>
+It's a <i>semantic</i> difference: With <code class="src src-clojure">eval</code>, the symbol
+<code class="src src-clojure">'hello</code> will have whatever value the <i>name</i>
+<code class="src src-clojure">hello</code> has; whereas <code class="src src-clojure"><span style="color: #6c71c4; font-weight: bold;">:hello</span></code> yields <code class="src src-clojure"><span style="color: #6c71c4; font-weight: bold;">:hello</span></code> as its value.
+</p></dd>
+<dt>Strings</dt><dd>Enclosed in double-quotes; use <code>str</code> to catenate a bunch of lists.</dd>
+<dt>Maps/Hashes/Dictionaries/property-lists</dt><dd>These structures allow you to associate
+keys/words/properties with values/definitions. <i>Extremely versatile!</i>
+
+<ul class="org-ul">
+<li>The empty map is <code>{}</code>;</li>
+<li><p>
+The map sending <code>keyᵢ</code> to <code>valueᵢ</code> is <code class="src src-clojure">{<span style="color: #6c71c4; font-weight: bold;">:key&#8320;</span> value&#8320; ... <span style="color: #6c71c4; font-weight: bold;">:key&#8345;</span> value&#8345;}</code>.
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">  (<span style="color: #859900; font-weight: bold;">def</span> <span style="color: #268bd2;">m</span> {<span style="color: #6c71c4; font-weight: bold;">:name</span> {<span style="color: #6c71c4; font-weight: bold;">:first</span> <span style="color: #2aa198;">"Bob"</span> <span style="color: #6c71c4; font-weight: bold;">:last</span> <span style="color: #2aa198;">"Abe"</span>} <span style="color: #6c71c4; font-weight: bold;">:age</span> 10 <span style="color: #6c71c4; font-weight: bold;">:act</span> +})
+  (m <span style="color: #6c71c4; font-weight: bold;">:age</span>) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 10</span>
+  (<span style="color: #6c71c4; font-weight: bold;">:last</span> (<span style="color: #6c71c4; font-weight: bold;">:name</span> m)) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; "Abe"</span>
+  (apply (get m <span style="color: #6c71c4; font-weight: bold;">:act</span>) [1 2]) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 3</span>
+
+  <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Keys can be anything</span>
+  ({3 40} 3) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 40</span>
+</pre>
+</div></li>
+
+<li>If <code>m</code> is a map, use <code>(:key m)</code> to get the value associated with <code>:key</code>.</li>
+<li>Since maps are essentially functions, you can use function application
+syntax: <code>(m key)</code>.</li>
+<li><p>
+Trying to get the value associated to a key <i>not in</i> a map will yield <code>nil</code>.
+</p>
+
+<p>
+Three equivalent ways to get the value of <code>k</code> in map <code>m</code> if it is in <code>m</code>, otherwise
+return default value <code>d</code> &#x2014;which is optional and defaults to <code>nil</code>.
+</p>
+
+<div class="org-center">
+<p>
+<code class="src src-clojure">(get m <span style="color: #6c71c4; font-weight: bold;">:k</span> d)</code>,
+<code class="src src-clojure">(m <span style="color: #6c71c4; font-weight: bold;">:k</span> d)</code>,
+<code class="src src-clojure">(<span style="color: #6c71c4; font-weight: bold;">:k</span> m d)</code>
+</p>
+</div>
+
+<p>
+In particular, observe that keywords <code>:k</code> act as functions
+that lookup a key in a map &#x2014;symbols also act as look-up
+functions.
+</p></li>
+<li>Starting from the empty map, one can ‘conjoin’ new values:
+<code class="src src-clojure">(conj {k v} m)</code> is the new map that at key <code>k</code>
+yields <code>v</code> and at all other keys behaves like <code>m</code>.</li>
+<li>Alternatively, use <code class="src src-clojure">(hash-map <span style="color: #6c71c4; font-weight: bold;">:key&#8320;</span> value&#8320; ... <span style="color: #6c71c4; font-weight: bold;">:key&#8345;</span> value&#8345;)</code> to make a map and <code class="src src-clojure">(get m key)</code> to get
+the value associated with key <code>key</code>.</li>
+</ul></dd>
+
+<dt>Vectors</dt><dd>(<i>Append friendly!</i>) These are like maps but numbers are used to
+access the values.  E.g., <code class="src src-clojure">(get [x&#8320; x&#8321; ... x&#8345;] i) = x&#7522;</code> for <code>i ∶ 0..n</code>.
+<ul class="org-ul">
+<li>Vectors can also be created with <code class="src src-clojure">(vector x&#8320; x&#8321; ... x&#8345;)</code>.</li>
+<li>Use <code>conj</code> to ‘conjoin’ a new element to the <i>end</i> of a vector:
+<code class="src src-clojure">(conj x&#8345;&#8330;&#8321; [x&#8320; ... x&#8345;]) = [x&#8320; ... x&#8345; x&#8345;&#8330;&#8321;]</code>.</li>
+</ul></dd>
+
+<dt>Lists</dt><dd><p>
+(<i>Prepend friendly!</i>) These are like vectors but <code>conj</code> adds elements to
+the <i>start</i> of a list.
+</p>
+<ul class="org-ul">
+<li><code>get</code> doesn't work with lists; use <code class="src src-clojure">(nth '(x&#8320; ... x&#8345;) i) = x&#7522;</code>.</li>
+<li>Lists can also be created with <code class="src src-clojure">(list x&#8320; x&#8321; ... x&#8345;)</code>.</li>
+</ul>
+
+<p>
+For lists, <code class="src src-clojure">conj</code> is also known as
+<code class="src src-clojure">cons</code> since it <i>constructs</i> lists by adding elements
+at the start. The operation to add elements at the end is known as <i>snoc</i>, the
+reverse reading of <i>cons</i>; as such, Clojure has both (cons) lists and snoc lists
+(vectors) as primitive data structures.
+</p></dd>
+
+<dt>Sets</dt><dd><p>
+Collections of unique values,
+<code class="src src-clojure">#{x&#8320; ... x&#8345;}</code> &#x2014;duplication is ignored in
+that
+</p>
+
+<p>
+<code class="src src-clojure">(conj xs x)</code> is just <code>xs</code> if <code>x</code> is already a member of set <code>x</code>.
+</p>
+<ul class="org-ul">
+<li>Sets can also be created with
+<code class="src src-clojure">(hash-set x&#8320; x&#8321; ... x&#8345;)</code>.</li>
+<li><code class="src src-clojure">(contains? xs x)</code> indicates whether <code>x</code> is an element of set <code>xs</code>.</li>
+<li>Sets are essentially maps where the values are just themselves:  <code class="src src-clojure">#{x&#8320; ... x&#8345;} = {x&#8320; x&#8320; ... x&#8345; x&#8345;}</code>; so you
+can use any of the three above ways to <code class="src src-clojure">get</code>
+values.</li>
+</ul></dd>
+</dl>
+
+<p>
+<i>Unlike</i> many other Lisps, in Clojure maps, vectors, lists, and sets can
+(<i>optionally</i>) have their arguments separated by <i>commas</i>!
+E.g.,
+<code class="src src-clojure">(= '(1 2 3) '(1, 2, 3) '(1 2, 3))</code> is true.
+</p>
+</div>
+</div>
+
+<div id="outline-container-Sequence-Collection-Methods" class="outline-2">
+<h2 id="Sequence-Collection-Methods"><span class="section-number-2">2</span> <a href="#Sequence-Collection-Methods">Sequence &amp; Collection Methods</a></h2>
+<div class="outline-text-2" id="text-Sequence-Collection-Methods">
+<p>
+All of Clojure's data structures &#x2014;strings, vectors, maps, lists, and sets&#x2014;
+take part in both the sequence abstraction and the collection abstraction.
+</p>
+
+<p>
+The sequence abstraction focuses on the elements, whereas the collection
+abstraction focuses on the structure as a whole.
+</p>
+</div>
+
+<div id="outline-container-The-Collection-Abstraction" class="outline-3">
+<h3 id="The-Collection-Abstraction"><span class="section-number-3">2.1</span> <a href="#The-Collection-Abstraction">The Collection Abstraction</a></h3>
+<div class="outline-text-3" id="text-The-Collection-Abstraction">
+<p>
+<b>The Collection Abstraction</b>
+</p>
+
+<ul class="org-ul">
+<li><code class="src src-clojure">count</code> ⇒ How many elements does the collection have?</li>
+<li><code class="src src-clojure">empty?</code> ⇒ Does it have any elements?</li>
+<li><code class="src src-clojure">every?</code> ⇒ Does every element in the collection satisfy a given predicate?</li>
+<li><p>
+<code class="src src-clojure">into</code> ⇒ Insert all the elements from the second collection <i>into</i> the first.
+</p>
+<ul class="org-ul">
+<li>E.g., <code class="src src-clojure">(into #{} xs)</code> converts <code>xs</code> into a set,
+whereas <code class="src src-clojure">(into {<span style="color: #6c71c4; font-weight: bold;">:a</span> 1} xs)</code> converts a list <code>xs</code> of
+<i>key-value vector pairs</i> into a map but <code>:a</code> will map to whatever it maps to in
+<code>xs</code>, if any, or 1 otherwise.</li>
+</ul>
+
+<p>
+This is like <code class="src src-clojure">concat</code> but it does a collection
+conversion: The result is the same collection type as the first argument.
+</p></li>
+<li><p>
+<code class="src src-clojure">(conj xs x)</code> ⇒ Insert <code>x</code> into the collection <code>xs</code>.
+</p>
+<ul class="org-ul">
+<li>For vectors, insert at the <i>end</i>.</li>
+<li>For lists, insert at the <i>beginning</i>.</li>
+<li>For sets, insert if it's not already in <code>xs</code>.</li>
+<li>For maps, <code>x</code> has the shape <code>{:key value}</code>, and we update the value of <code>:key</code> in
+<code>xs</code> to now be associated with <code>value</code>.</li>
+</ul>
+
+<p>
+This is like <code>cons</code> but it <i>preserves</i> the collection type &#x2014;whereas <code>cons</code> forces
+it to be a list: <code class="src src-clojure">(cons x xs) = (cons x (seq xs))</code>
+where <code class="src src-clojure">(seq xs) = (into '() xs)</code> is discussed below.
+</p>
+
+<p>
+<code class="src src-clojure">(conj xs x) = (into {} (cons x xs))</code> for <code>xs</code> a map.
+</p>
+
+<p>
+<code>conj</code> and <code>into</code> are essentially the same function, except one takes a varadic
+number of arguments whereas the other takes a formal sequence for the second
+argument:
+</p>
+
+<p>
+<code class="src src-clojure">(conj xs y&#8320; y&#8321; ... y&#8345;) = (into xs (list y&#8320; y&#8321; ... y&#8345;))</code>
+</p></li>
+</ul>
+
+<p>
+In summary, every collection can be formed from the empty collection &#x2014;
+<code class="src src-clojure">'(), [], {}, #{}</code> &#x2014; and using <code class="src src-clojure">into</code> to shove new elements <i>into</i> it &#x2014;alternatively, <i>conjoining</i> new
+elements with <code class="src src-clojure">conj</code>.  Interestingly,
+<code class="src src-clojure">(into '() xs)</code> reverses a list <code>xs</code> but does nothing to
+a vector <code>xs</code> &#x2014;since <code>conj</code> prepends for lists and appends for vectors.
+</p>
+</div>
+</div>
+
+<div id="outline-container-The-Sequence-Abstraction" class="outline-3">
+<h3 id="The-Sequence-Abstraction"><span class="section-number-3">2.2</span> <a href="#The-Sequence-Abstraction">The Sequence Abstraction</a></h3>
+<div class="outline-text-3" id="text-The-Sequence-Abstraction">
+<p>
+<b>The Sequence Abstraction</b>
+</p>
+
+<p>
+Sequences implement <code class="src src-clojure">first, rest, cons</code> and so may use
+the sequence operations <code class="src src-clojure">map, reduce, filter, distinct, group-by, ...</code>.
+</p>
+
+<p>
+Using <code class="src src-clojure">first</code> and <code class="src src-clojure">rest</code> we
+can always obtain a list from any sequence type; the method to do so is called
+<code class="src src-clojure">seq</code> and it's characterised by: <code class="src src-clojure">(seq xs) = (cons (first xs) (seq (rest xs)))</code>.  For instance, for maps,
+<code class="src src-clojure">(seq {key&#8320; val&#8320; ... key&#8345; val&#8345;}) = '([key&#8320; val&#8320;] ... [key&#8345; val&#8345;])</code>.  Moreover, whenever a sequence is expected, <code>seq</code> is called &#x2014;e.g., when
+<code>map</code> is called.  This is why <code>map</code> always
+returns a list; e.g., <code class="src src-clojure">(map #(* 3 (second <span style="color: #268bd2;">%</span>)) {<span style="color: #6c71c4; font-weight: bold;">:a</span> 1 <span style="color: #6c71c4; font-weight: bold;">:b</span> 3 <span style="color: #6c71c4; font-weight: bold;">:c</span> 5}) = '(3 9 15)</code>. Use <code class="src src-clojure">into</code> &#x2014;discussed
+above&#x2014; to convert to a different sequence type.
+</p>
+
+<p>
+Below are a few examples <i>shown using lists</i>, but they work with the other
+data-structures too, such as hashmaps!
+</p>
+
+<ul class="org-ul">
+<li><p>
+<code class="src src-clojure">(range start end) = (list start (+ start 1) (+ start 2) ... (dec end))</code>.
+</p>
+
+<p>
+<code class="src src-clojure">start</code> may be omitted, defaulting to 0.
+</p></li>
+
+<li><code class="src src-clojure">(concat '(x&#8320; ... x&#8342;) '(x&#8342; x&#8342;&#8330;&#8321; ... x&#8345;)) = '(x&#8320; ... x&#8345;)</code>.</li>
+<li><p>
+<code class="src src-clojure">(some p xs) = (p x&#8342;)</code> where <code>xₖ</code> is the first element to satisfy predicate <code>p</code>; or
+nil otherwise. (<i>Linear Search</i>)
+</p>
+
+<p>
+<code class="src src-clojure">(some #(<span style="color: #859900; font-weight: bold;">and</span> (p <span style="color: #268bd2;">%</span>) <span style="color: #268bd2;">%</span>) xs) = x&#8342;</code> is how to get the
+actual element that satisfies the predicate <code>p</code>, if any.
+</p></li>
+<li><p>
+<code class="src src-clojure">map</code> zips its lists arguments together along a
+given “zipping function” <code>f</code>.
+</p>
+
+<p>
+<code class="src src-clojure">(nth (map f xs&#8320; xs&#8321; ... xs&#8345;) i)</code>  = <code class="src src-clojure">(f (nth xs&#8320; i) (nth xs&#8321; i) ... (nth xs&#8345; i))</code>
+</p>
+
+<p>
+For <code>f</code> being <code>vector</code>, the <code>map</code> takes some lists (“rows”) and produces a list of
+lists (“columns”) &#x2014;think “matrix transpose” or “tupling”.
+</p>
+
+<p>
+Recall that <code>:key</code> act as functions extracting the values associated
+with key <code>:key</code>; whence, <code>(map :key ms)</code> projects the value of <code>:key</code> from
+each map in <code>ms</code>.
+</p></li>
+<li><p>
+<code class="src src-clojure">reduce</code> replaces every (implicit)
+<code class="src src-clojure"><span style="color: #b58900; font-style: italic;">cons</span>/conj</code> with a new binary operation.
+</p>
+
+<p>
+<code class="src src-clojure">(reduce &#8853; e '(x&#8320; x&#8321; ... x&#8345;)) = (&#8853; (&#8853; (&#8853; (&#8853; e x&#8320;) x&#8321;) ...) x&#8345;)</code>
+</p>
+
+<p>
+The initial value <code>e</code> is optional and may be omitted.
+</p></li>
+<li><code class="src src-clojure">take k '(x&#8320; x&#8321; ... x&#8345;)) = '(x&#8320; x&#8321; ... x&#8342;&#8331;&#8321;)</code></li>
+<li><code class="src src-clojure">drop k '(x&#8320; x&#8321; ... x&#8345;)) = '(x&#8342; x&#8342;&#8330;&#8321; ... x&#8345;)</code></li>
+<li><code class="src src-clojure">take-while p '(x&#8320; x&#8321; ... x&#8345;)) = '(x&#8320; x&#8321; ... x&#8342;&#8331;&#8321;)</code>
+<i>where</i> <code>xₖ</code> is the first element to not satisfy the predicate <code>p</code>.</li>
+<li><code class="src src-clojure">drop-while p '(x&#8320; x&#8321; ... x&#8345;)) = '(x&#8342; x&#8342;&#8330;&#8321; ... x&#8345;)</code>
+<i>where</i> <code>xₖ</code> is the first element to not satisfy the predicate <code>p</code>.</li>
+<li>Extensionality: <code class="src src-clojure">xs = (concat (take-while p xs) (drop-while p xs))</code></li>
+<li><code class="src src-clojure">(filter p xs)</code> is the <i>largest</i> subsequence of <code>xs</code>
+whose elements all satisfy predicate <code>p</code>; unlike <code>take-while</code>, it process <i>all</i> of
+<code>xs</code> rather than stopping at the first value that falsifies the predicate <code>p</code>.</li>
+<li><code class="src src-clojure">sort</code> sorts a list in ascending order.</li>
+<li><code class="src src-clojure">(sort-by f xs)</code> sorts the elements of <code>xs</code> according
+to the order ‘⊏’ defined by <code>x ⊏ y ≡ f x &lt; f y</code>. E.g., <code class="src src-clojure">(sort-by count xss)</code> sorts the sequence of sequences <code>xss</code> according to
+their length.</li>
+</ul>
+
+<p>
+There is also <i>list comprehensions</i>
+<code class="src src-clojure">(<span style="color: #859900; font-weight: bold;">for</span> [x xs] body) = (map (<span style="color: #859900; font-weight: bold;">fn</span> [x] body) xs)</code>;
+more generally, these are “nested for-loops”:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-clojure">  (<span style="color: #859900; font-weight: bold;">for</span> [x&#8320; xs&#8320; ... x&#8345; xs&#8345; <span style="color: #6c71c4; font-weight: bold;">:let</span> &#120001;&#119992; <span style="color: #6c71c4; font-weight: bold;">:when</span> &#120012;&#119992;] body)
+= (map (<span style="color: #859900; font-weight: bold;">fn</span> [[x&#8320; x&#8321; ... x&#8345;]] (<span style="color: #859900; font-weight: bold;">let</span> &#120001;&#119992; body))
+       (filter (<span style="color: #859900; font-weight: bold;">fn</span> [[x&#8320; x&#8321; ... x&#8345;]] (<span style="color: #859900; font-weight: bold;">let</span> &#120001;&#119992; (<span style="color: #859900; font-weight: bold;">when</span> &#120012;&#119992; [x&#8320; ... x&#8345;])))
+               (cartesian-product xs&#8320; xs&#8321; ... xs&#8345;)))
+</pre>
+</div>
+<p>
+Where a supposed <code class="src src-clojure">cartesian-product</code> function
+essentially behaves as <code class="src src-clojure">(<span style="color: #859900; font-weight: bold;">for</span> [x&#8320; xs&#8320; ... x&#8345; xs&#8345;] [x&#8320; ... x&#8345;])</code> &#x2014;i.e., it returns all vectors <code class="src src-clojure">vs</code> where
+<code class="src src-clojure">(nth vs i)</code> is an element of <code class="src src-clojure">xs&#7522;</code>.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-Laziness-I-thunk-therefore-I'm-done" class="outline-2">
+<h2 id="Laziness-I-thunk-therefore-I'm-done"><span class="section-number-2">3</span> <a href="#Laziness-I-thunk-therefore-I'm-done">Laziness: “I <i>thunk</i>, therefore I'm done!”</a></h2>
+<div class="outline-text-2" id="text-Laziness-I-thunk-therefore-I'm-done">
+<p>
+The <code>map</code> (and <code>filter</code>) function is <i>lazy</i>: The iᵗʰ-element of <code>(map f xs)</code> is computed
+<i>only</i> when it is actually needed. E.g., <code>(first (map f xs))</code> is <code>(f (first xs))</code> and
+so the rest of the map is not evaluated at all.
+</p>
+
+<p>
+Likewise, <code>(def result (map f xs))</code> is evaluated nearly instantaneously regardless
+of how big <code>xs</code> may be: The <code>map</code> is computed as elements of <code>result</code> are accessed.
+If you try to access or “think” of <code>(nth result i)</code> then if it is already computed
+&#x2014;i.e., we have already “thunk” it&#x2014; then we return that value, otherwise, we
+compute it and return it.
+</p>
+
+<p>
+More accurately, Clojure <i>chunks</i> its computations: When an element is requested,
+it will compute a few elements after it as well since you're likely to request
+them as well. From below, it can be seen that it computes the next 30
+elements.
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #859900; font-weight: bold;">def</span> <span style="color: #268bd2;">result</span> (map #(<span style="color: #859900; font-weight: bold;">do</span> (<span style="color: #b58900; font-style: italic;">Thread</span>/sleep 100) (* 2 <span style="color: #268bd2;">%</span>)) (range 0 100)))
+(time (nth result 1))  <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 2;  Elapsed time: 3270.204959 msecs</span>
+(time (nth result 30)) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 60; Elapsed time: 0.051002 msecs (Neato!)</span>
+(time (nth result 33)) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 66; Elapsed time: 3293.824322 msecs</span>
+</pre>
+</div>
+
+<p>
+Accessing the first element takes ~3200 milliseconds since Clojure prepared the
+next ~30 elements in case we want to access them next; e.g., in the next line we
+access the 30th element almost instantaneously. After that, we try to access
+an element not yet computed and it and the next ~30 after it are computed.
+</p>
+
+<p>
+Note:
+</p>
+<ul class="org-ul">
+<li><code>(Thread/sleep 1000)</code> ⇒ Sleep/pause for 1second</li>
+<li><code>(time e)</code> ⇒ Evaluate <code>e</code> and return its value <i>along</i> with a print
+to standard output indicating how long it took to evaluate <code>e</code>.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-clojure">(+ 2 (time (+ 1 2))) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 5 (Elapsed time: 0.022374 msecs)</span>
+</pre>
+</div>
+
+
+<p>
+<b>Warning: Unused = Unevaluated!</b>
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure"><span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Since the map's result in unused, it is not evaluated!</span>
+(<span style="color: #859900; font-weight: bold;">do</span> (map print (range 0 100)) (println <span style="color: #2aa198;">"bye"</span>)) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Prints' &#8220;bye&#8221; only</span>
+<span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Use &#8220;mapv&#8221; which is eager!</span>
+(<span style="color: #859900; font-weight: bold;">do</span> (mapv print (range 0 100)) (println <span style="color: #2aa198;">"bye"</span>)) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Prints' &#8220;01...100bye&#8221; only</span>
+</pre>
+</div>
+
+<p>
+<b>Infinite sequences:</b>
+<code class="src src-clojure">(repeat x)</code> is the infinite sequence that returns <code>x</code> at every index:
+<code class="src src-clojure">(nth (repeat x) i) = x</code> for any <i>i ≥ 0</i>.
+</p>
+
+<p>
+Evaluating <code class="src src-clojure">(repeat x)</code> will <i>take forever</i> since it's
+an infinite list; instead use <code class="src src-clojure">(take n (repeat x))</code> to
+get a finite list of length <code>n</code>.
+</p>
+
+<p>
+Likewise, <code class="src src-clojure">(repeatedly f)</code> generates an infinite
+sequence from the nullary function <code>f</code>.
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">(take 3 (repeatedly (<span style="color: #859900; font-weight: bold;">fn</span> [] (rand-int 10)))) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; '(5 9 6)</span>
+(take 2 (repeat <span style="color: #2aa198;">"n"</span>))  <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; '("n" "n")</span>
+</pre>
+</div>
+
+<p>
+You can also use <code class="src src-clojure">lazy-seq</code> to treat a sequence lazily.
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #859900; font-weight: bold;">defn</span> <span style="color: #b58900;">evens</span>
+  ([]  (evens 0))
+  ([n] (cons (* 2 n) (lazy-seq (evens (inc n))))))
+
+(take 3 (evens)) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; '(0 2 4)</span>
+</pre>
+</div>
+</div>
+
+<div id="outline-container-Memoize" class="outline-3">
+<h3 id="Memoize"><span class="section-number-3">3.1</span> <a href="#Memoize">Memoize</a></h3>
+<div class="outline-text-3" id="text-Memoize">
+<p>
+You can memoize a function <code class="src src-clojure">f</code> so that if you've
+already ‘thunk’ it at input <code class="src src-clojure">a</code> then anytime
+<code class="src src-clojure">(f a)</code> you get the value <i>immediately!</i>
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #859900; font-weight: bold;">defn</span> <span style="color: #b58900;">slow</span> [x] (<span style="color: #b58900; font-style: italic;">Thread</span>/sleep 1000) x)
+(<span style="color: #859900; font-weight: bold;">def</span> <span style="color: #268bd2;">fast</span> (memoize slow))
+(time (fast 1)) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; &#8220;Think it!&#8221; Elapsed time: 1000.529943 msecs</span>
+(time (fast 1)) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; &#8220;Already thunk it!&#8221; Elapsed time: 0.068761 msecs</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-Conditionals" class="outline-2">
+<h2 id="Conditionals"><span class="section-number-2">4</span> <a href="#Conditionals">Conditionals</a></h2>
+<div class="outline-text-2" id="text-Conditionals">
+<p>
+Booleans: <code class="src src-clojure"><span style="color: #6c71c4; font-weight: bold;">true</span></code> and <code class="src src-clojure"><span style="color: #6c71c4; font-weight: bold;">false</span></code>
+</p>
+<ul class="org-ul">
+<li>(Deep structural) equality: <code class="src src-clojure">(= x y)</code>.</li>
+<li><code class="src src-clojure"><span style="color: #6c71c4; font-weight: bold;">nil</span></code> indicates <i>no value</i>.
+<ul class="org-ul">
+<li>(<i>Warning!</i> Unlike other Lisps, <code>nil ≠ false</code> and <code>nil ≠ '()</code>! )</li>
+</ul></li>
+<li>Use <code class="src src-clojure">nil?</code> to check if a value is <code>nil</code>.</li>
+<li>Comparisons: As expected; e.g., <code class="src src-clojure">(&lt;= x y)</code> denotes <i>x ≤ y</i>.</li>
+</ul>
+
+
+<p>
+Regarding Boolean operations &#x2014;such as <code class="src src-clojure">and, or, if</code>&#x2014; both <code class="src src-clojure"><span style="color: #6c71c4; font-weight: bold;">nil</span></code> and <code class="src src-clojure"><span style="color: #6c71c4; font-weight: bold;">false</span></code> denote
+<i>logically false values</i>; everything else denotes logical truth: <code class="src src-clojure">(boolean x)</code>
+returns true exactly when <code>x</code> is truthy &#x2014;i.e., it converts things to Booleans.
+</p>
+
+<ul class="org-ul">
+<li><code class="src src-clojure">or, and</code> returns the first truthy / fasley value if
+any, or the last value otherwise.</li>
+<li><code class="src src-clojure">if</code> takes <b>at-most 3</b> arguments: <code class="src src-clojure">(<span style="color: #859900; font-weight: bold;">if</span> condition thenExpr optionalElseExpr)</code>
+<ul class="org-ul">
+<li>If you want to perform <b>multiple expressions</b>, use <code class="src src-clojure">do</code> &#x2014;this is <code>progn</code> in CommonLisp.</li>
+<li>Note: <code class="src src-clojure">(<span style="color: #859900; font-weight: bold;">if</span> x y) = (<span style="color: #859900; font-weight: bold;">if</span> x y <span style="color: #6c71c4; font-weight: bold;">nil</span>)</code>;
+ better: <code class="src src-clojure">(<span style="color: #859900; font-weight: bold;">when</span> c thenBlock) = (<span style="color: #859900; font-weight: bold;">if</span> c (<span style="color: #859900; font-weight: bold;">do</span> thenBlock))</code>.</li>
+<li><code class="src src-clojure">(<span style="color: #859900; font-weight: bold;">if</span> xs ...)</code> means “if xs is non-fasley then &#x2026;” is
+akin to C style idioms on linked lists. E.g., <code class="src src-clojure">(<span style="color: #859900; font-weight: bold;">if</span> 9 2 4) = 2</code>.</li>
+</ul></li>
+</ul>
+
+<div style="column-rule-style: none;column-count: 2;">
+
+<p>
+Avoid nested if-then-else clauses by using a <code class="src src-clojure">cond</code>
+statement &#x2013;a (lazy) generalisation of switch statements: It sequentially
+evaluates the expressions <code class="src src-clojure">test&#7522;</code> and performs only
+the action of the first true test; yielding <code class="src src-clojure"><span style="color: #6c71c4; font-weight: bold;">nil</span></code> when
+no tests are true. Below we use the keyword <code class="src src-clojure"><span style="color: #6c71c4; font-weight: bold;">:else</span></code> to
+<i>simulate</i> a ‘default case’&#x2014;indeed, any non-falsey value would have sufficed.
+</p>
+
+<p>
+<p><br>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #859900; font-weight: bold;">cond</span>
+  test&#8320; expr&#8320;
+  test&#8321; expr&#8321;
+   &#8942;
+  <span style="color: #6c71c4; font-weight: bold;">:else</span> defaultExpr)) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">optional</span>
+</pre>
+</div>
+
+
+</div>
+
+<p>
+Replacing <code class="src src-clojure">cond</code> by <code class="src src-clojure">case x</code>
+results in an <i>exhaustive</i> case-analysis: If <code class="src src-clojure">x</code> is the
+literal expression <code class="src src-clojure">test&#7522;</code> then yield
+<code class="src src-clojure">expr&#7522;</code>, if no match happens, crash &#x2014;to use a
+default, just have a default value as the final expression, no need to precede
+it by anything. A hybrid of <code class="src src-clojure">cond</code> and
+<code class="src src-clojure">case</code> is <code class="src src-clojure">condp</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-Block-of-Code-do-and-control-flow-and-or" class="outline-2">
+<h2 id="Block-of-Code-do-and-control-flow-and-or"><span class="section-number-2">5</span> <a href="#Block-of-Code-do-and-control-flow-and-or">Block of Code <code>do</code> and control flow <code>and, or</code></a></h2>
+<div class="outline-text-2" id="text-Block-of-Code-do-and-control-flow-and-or">
+<p>
+Use the <code>do</code> function to treat multiple expressions as a single expression. E.g.,
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #859900; font-weight: bold;">do</span> (println <span style="color: #2aa198;">"hello"</span>)
+    (<span style="color: #859900; font-weight: bold;">def</span> <span style="color: #268bd2;">x</span>  (<span style="color: #859900; font-weight: bold;">if</span> (&lt; 2 3) 'two-less-than-3))
+    (println (format <span style="color: #2aa198;">"%s"</span> x))
+    23) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Return value of the &#8220;do&#8221; block</span>
+</pre>
+</div>
+
+<p>
+This’ like curly-braces in C or Java. The difference is that the last expression
+is considered the ‘return value’ of the block.
+</p>
+
+<ul class="org-ul">
+<li><p>
+Lazy conjunction and disjunction ---<code>and, or</code>&#x2014; can be thought of as <i>control
+flow</i> first and Boolean operations second:
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">  (<span style="color: #859900; font-weight: bold;">and</span> s&#8320; ... s&#8345; e)  &#8658;  when all x&#7522; are non-falsey, do e
+  (<span style="color: #859900; font-weight: bold;">or</span>  s&#8320; ... s&#8345; e)  &#8658;  when no x&#7522; is falsey, do e
+</pre>
+</div></li>
+<li>That is, <code>and</code> is the <i>maybe monad</i>: Perform multiple statements but stop when
+any of them fails, returns falsey.</li>
+<li>Likewise, <code>or</code> performs multiple statements until one of them succeeds, returns
+non-falsey:</li>
+<li>We can coerce a statement <code>sᵢ</code> to returning non-falsey as so: (<code>do sᵢ true)</code>.
+Likewise, coerce falsey by <code>(do sᵢ nil)</code>.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-Functions" class="outline-2">
+<h2 id="Functions"><span class="section-number-2">6</span> <a href="#Functions">Functions</a></h2>
+<div class="outline-text-2" id="text-Functions">
+<p>
+Functions are (<i>unexceptional</i>) data:
+</p>
+
+<div style="column-rule-style: none;column-count: 2;">
+<div class="org-src-container">
+<pre class="src src-clojure"><span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Add numbers</span>
+(+ 1 2 3) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 6</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-clojure"><span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Apply a function to each number</span>
+(map inc [2 4 6]) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; (3 5 7)</span>
+</pre>
+</div>
+
+</div>
+
+
+<p>
+Function invocation: <code>(f x₀ x₁ ... xₙ)</code>. E.g., <code>(+ 3 4)</code> or <code>(print "hello")</code>.
+</p>
+
+<ul class="org-ul">
+<li>Clojure is <i>strict</i>: In a function call, all arguments are evaluated <b>before</b> the
+function is executed. Besides function calls, there are <i>special forms</i> which are
+‘special’ since they don't always evaluate all of their operands; e.g., <code>if</code>,
+<code>when</code>, and macros such as <code>def</code>. There are also ‘lazy collection’ types.</li>
+
+<li>Only prefix invocations means we can use <code>-,+,*</code> in <i>names</i>
+since <code>(f+*- a b)</code> is parsed as applying function <code>f+*-</code> to arguments <code>a</code> and <code>b</code>.</li>
+</ul>
+<ul class="org-ul">
+<li><p>
+Function definition:
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #859900; font-weight: bold;">defn</span> <span style="color: #b58900;">my-function</span>
+  <span style="color: #35a69c; font-style: italic;">"This functions performs task ..."</span>      <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">documentation, optional</span>
+  [arg&#8320; arg&#8321; &amp; more]                    <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">header, signature</span>
+  (str arg&#8320; arg&#8321; (nth more 3)))         <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">body, instructions</span>
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>The <b>return value</b> of the function is the result of the last expression executed.</li>
+<li><p>
+The documentation string may indicate the return type, among other things.
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">(doc my-function) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; See signature and docstring</span>
+</pre>
+</div></li>
+<li><p>
+In function definition, use <code>&amp;</code> to make a function take <i>any extra</i> number of
+arguments; it must come at the end and it is treated as a list in the function
+body. This is known as a <i>rest parameter</i>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-clojure">(my-function <span style="color: #2aa198;">"x"</span> <span style="color: #2aa198;">"y"</span> <span style="color: #2aa198;">"a"</span> <span style="color: #2aa198;">"b"</span> <span style="color: #2aa198;">"c"</span> <span style="color: #2aa198;">"d"</span>) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; "xyd"</span>
+</pre>
+</div></li>
+</ul></li>
+</ul>
+</div>
+
+<div id="outline-container-Arity-Overloading" class="outline-3">
+<h3 id="Arity-Overloading"><span class="section-number-3">6.1</span> <a href="#Arity-Overloading">Arity Overloading</a></h3>
+<div class="outline-text-3" id="text-Arity-Overloading">
+<p>
+Functions also support <b>arity overloading</b>, which act as a way to support default
+arguments.
+</p>
+
+<div style="column-rule-style: none;column-count: 2;">
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #859900; font-weight: bold;">defn</span> <span style="color: #b58900;">doit</span>
+  ([x y z]
+    (+ x y z))
+  ([x y]
+     <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">default value for z</span>
+    (doit x y 666))
+  ([x]
+    <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Completely different behaviour</span>
+    <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">when y,z omitted</span>
+    (* 7 x)))
+</pre>
+</div>
+<p>
+<p><br>
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">(doit 1 2 3) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 6</span>
+(doit 1 2)   <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 669</span>
+(doit 1)     <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 7</span>
+</pre>
+</div>
+
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-Runtime-Polymorphism-Arbitrary-dispatch" class="outline-3">
+<h3 id="Runtime-Polymorphism-Arbitrary-dispatch"><span class="section-number-3">6.2</span> <a href="#Runtime-Polymorphism-Arbitrary-dispatch">Runtime Polymorphism; Arbitrary dispatch</a></h3>
+<div class="outline-text-3" id="text-Runtime-Polymorphism-Arbitrary-dispatch">
+<p>
+Instead of dispatching/choosing function definitional clauses according to
+arity, some language also allow dispatch according to argument type; Clojure
+goes further by <i>dispatching along the result of an arbitrary function of the
+arguments.</i> These functions are called <i>multimethods</i>; they are defined by
+<code class="src src-clojure">defmulti</code> which takes their name and the dispatch
+function, then each overloaded method is defined independently using
+<code class="src src-clojure">defmethod</code> which takes the multimethod name, the
+dispatch value, and the function body.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-clojure"><span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8220;doit&#8221; is an overloaded method, dispatched along</span>
+<span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">the &#8220;:kind&#8221; value of the 1&#738;&#7511; arg, being a hashmap,</span>
+<span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">AND along the length of the second argument, being a sequence.</span>
+<span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">That is, the dispatch value is a vector of length 2.</span>
+(<span style="color: #859900; font-weight: bold;">defmulti</span>  <span style="color: #b58900;">doit</span> (<span style="color: #859900; font-weight: bold;">fn</span> [x y] [(<span style="color: #6c71c4; font-weight: bold;">:kind</span> x) (count y)]))
+
+<span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Here are three boring implementations, along the dispatch value</span>
+(<span style="color: #859900; font-weight: bold;">defmethod</span> <span style="color: #b58900;">doit</span> [<span style="color: #6c71c4; font-weight: bold;">:fruit</span>  5] [x y] <span style="color: #6c71c4; font-weight: bold;">:one</span>)
+(<span style="color: #859900; font-weight: bold;">defmethod</span> <span style="color: #b58900;">doit</span> [<span style="color: #6c71c4; font-weight: bold;">:fruit</span>  4] [x y] <span style="color: #6c71c4; font-weight: bold;">:two</span>)
+(<span style="color: #859900; font-weight: bold;">defmethod</span> <span style="color: #b58900;">doit</span> [<span style="color: #6c71c4; font-weight: bold;">:veggie</span> 4] [x y] <span style="color: #6c71c4; font-weight: bold;">:three</span>)
+
+<span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Optional default method when nothing matches</span>
+(<span style="color: #859900; font-weight: bold;">defmethod</span> <span style="color: #b58900;">doit</span> <span style="color: #6c71c4; font-weight: bold;">:default</span> [x y] x)
+
+<span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Example calls</span>
+(doit {<span style="color: #6c71c4; font-weight: bold;">:kind</span> <span style="color: #6c71c4; font-weight: bold;">:fruit</span>  <span style="color: #6c71c4; font-weight: bold;">:age</span> 10} <span style="color: #2aa198;">"hola!"</span>) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; :one</span>
+(doit {<span style="color: #6c71c4; font-weight: bold;">:kind</span> <span style="color: #6c71c4; font-weight: bold;">:veggie</span> <span style="color: #6c71c4; font-weight: bold;">:age</span> 10} <span style="color: #2aa198;">"hola!"</span>) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; the 1&#738;&#7511; arg</span>
+      <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; Without the default method, this crashes!</span>
+</pre>
+</div>
+
+<p>
+<i>Multimethods are another way to define ordinary functions, and so can be used
+wherever a function is used.</i> Such functions could be defined using
+<code class="src src-clojure">condp</code> to dispatch along the appropriate
+implementation; but this is more difficult to maintain as more alternatives are
+added, whereas the <code class="src src-clojure">defmethod</code> approach is a nice
+<i>separation of concerns</i> &#x2014;also known as <a href="https://stackoverflow.com/questions/62057461/what-are-the-benefits-of-using-multimethods-instead-of-cond-in-clojure">open-closed principle</a>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-You-can-also-destructure-parameters" class="outline-3">
+<h3 id="You-can-also-destructure-parameters"><span class="section-number-3">6.3</span> <a href="#You-can-also-destructure-parameters">You can also <i>destructure</i> parameters</a></h3>
+<div class="outline-text-3" id="text-You-can-also-destructure-parameters">
+<p>
+You can also <i>destructure</i> parameters &#x2014;lists and maps are discussed below.
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #859900; font-weight: bold;">defn</span> <span style="color: #b58900;">doit2</span>
+  [ [x y &amp;zs] <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">The first argument is a list/vector consisting</span>
+              <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">of at least 2 values, say x and y, then</span>
+              <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">followed by the list/vector zs</span>
+
+    {w <span style="color: #6c71c4; font-weight: bold;">:w</span>}   <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">The second argument is a map;</span>
+  ]          <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Let w denote the value of key :w in the map.</span>
+
+  (+ y (<span style="color: #859900; font-weight: bold;">or</span> w 1))) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">In-case :w is not in the map, use 1 as default.</span>
+
+(doit2 [1 2 3 4] {<span style="color: #6c71c4; font-weight: bold;">:v</span> 5 <span style="color: #6c71c4; font-weight: bold;">:w</span> 6}) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 7</span>
+<span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">(doit2 [1] {:v 5 :w 6}) ;; &#8658; Error: First argument too short!</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-Anonymous-functions" class="outline-3">
+<h3 id="Anonymous-functions"><span class="section-number-3">6.4</span> <a href="#Anonymous-functions">Anonymous functions</a></h3>
+<div class="outline-text-3" id="text-Anonymous-functions">
+<p>
+Anonymous functions: <code>(fn [arg₀ ... argₖ] bodyHere)</code>; as usual, you can also
+destructure arguments and have rest parameters.
+</p>
+
+<div style="column-rule-style: none;column-count: 2;">
+<div class="org-src-container">
+<pre class="src src-clojure"><span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">make then later invoke</span>
+(<span style="color: #859900; font-weight: bold;">def</span> <span style="color: #268bd2;">my-f</span> (<span style="color: #859900; font-weight: bold;">fn</span> [x y] (+ x y)))
+(my-f 1 2) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 3</span>
+
+<span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">make and immediately invoke</span>
+((<span style="color: #859900; font-weight: bold;">fn</span> [x y] (+ x y)) 1 2) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 3</span>
+</pre>
+</div>
+<p>
+<p><br>
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure"><span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Super terse notation</span>
+(map #(* <span style="color: #268bd2;">%</span> 2) [1 2 3]) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; [2 4 6]</span>
+</pre>
+</div>
+<p>
+The anonymous function <code>#(...%i...)</code> is a function where <code>%i</code> refers to the <i>i</i>-th
+argument; <code>%</code> is equivalent to <code>%1</code> and <code>%&amp;</code> refers to the rest parameter.
+</p>
+
+</div>
+</div>
+</div>
+
+<div id="outline-container-Keyword-named-arguments" class="outline-3">
+<h3 id="Keyword-named-arguments"><span class="section-number-3">6.5</span> <a href="#Keyword-named-arguments">Keyword / named arguments</a></h3>
+<div class="outline-text-3" id="text-Keyword-named-arguments">
+<p>
+<i>Keyword/named arguments</i> = rest parameters + (hash)maps + destructuring.
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #859900; font-weight: bold;">defn</span> <span style="color: #b58900;">f</span> [a &amp; {<span style="color: #6c71c4; font-weight: bold;">:keys</span> [b c d] <span style="color: #6c71c4; font-weight: bold;">:or</span> {c 7 d 11}}] (list a b c d))
+</pre>
+</div>
+
+<p>
+Huh? <code>f</code> has a required argument, <code>a</code>, followed by a rest parameter (<code>&amp;</code>), that we
+destructure into a hashmap <code>{...}</code>, whose <code>:keys</code> <i>contain at least</i> <code>b, c, d</code> ---<code>:or</code>, if
+the key <code>c</code> is not there then use 7 as <i>default</i>, and likewise use 11 as default for
+<code>d</code>.
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure"><span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">(f)                   &#8658; Error, &#8220;a&#8221; is a required positional argument!</span>
+(f 2) <span style="color: #96A7A9; font-style: italic;">;;                            </span><span style="color: #96A7A9; font-style: italic;">&#8658; '(2 nil 7 11)</span>
+(f 2 <span style="color: #6c71c4; font-weight: bold;">:d</span> 4) <span style="color: #96A7A9; font-style: italic;">;;                       </span><span style="color: #96A7A9; font-style: italic;">&#8658; '(2 nil 7 4)</span>
+(f 2 <span style="color: #6c71c4; font-weight: bold;">:c</span> 5 <span style="color: #6c71c4; font-weight: bold;">:b</span> 3 <span style="color: #6c71c4; font-weight: bold;">:d</span> 7) <span style="color: #96A7A9; font-style: italic;">;;             </span><span style="color: #96A7A9; font-style: italic;">&#8658; '(2 3 5 7)</span>
+(f 2 <span style="color: #6c71c4; font-weight: bold;">:ignored</span> 99 <span style="color: #6c71c4; font-weight: bold;">:whatever</span> <span style="color: #2aa198;">"ok"</span>) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; '(2 nil 7 11)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-Higher-order-functions" class="outline-3">
+<h3 id="Higher-order-functions"><span class="section-number-3">6.6</span> <a href="#Higher-order-functions">Higher order functions</a></h3>
+<div class="outline-text-3" id="text-Higher-order-functions">
+<p>
+<b>Higher order functions</b>
+</p>
+
+<ul class="org-ul">
+<li><p>
+<code class="src src-clojure">apply</code> unpacks a sequence so it can be passed to a function that expects
+a rest parameter. For any <i>k ≥ 0</i>,
+</p>
+<div class="org-center">
+<p>
+<code class="src src-clojure">(apply f x&#8320; x&#8321; ... x&#8342;&#8331;&#8321; '(x&#8342; x&#8342;&#8330;&#8321; ... x&#8345;)) = (f x&#8320; x&#8321; ... x&#8345;)</code>
+</p>
+</div></li>
+
+<li><p>
+If <code class="src src-clojure">f</code> is a function of <code class="src src-clojure">n</code> arguments, then <code class="src src-clojure">(partial f x&#8320; x&#8321; ... x&#8342;&#8331;&#8321;)</code> is the
+function <code>f</code> with it's first <code>k</code> arguments already given and the remaining <code>n - k</code>
+elements not yet given.
+</p>
+<div class="org-center">
+<p>
+<code class="src src-clojure">(partial f x&#8320; x&#8321; ... x&#8342;&#8331;&#8321;) = #(apply f x&#8320; x&#8321; ... x&#8342;&#8331;&#8321; <span style="color: #268bd2;">%&amp;</span>)</code>
+</p>
+</div></li>
+
+<li><code class="src src-clojure">(complement p) = #(not (apply p <span style="color: #268bd2;">%&amp;</span>))</code></li>
+
+<li><code class="src src-clojure">(identity x) = x</code></li>
+
+<li><code class="src src-clojure">(comp f&#8321; f&#8322; ... f&#8345;) = #(f&#8321; (f&#8322; (... (apply f&#8345; <span style="color: #268bd2;">%&amp;</span>))))</code>;
+if <i>n = 0</i>, this is just <code class="src src-clojure">identity</code>.</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-Let-and-Loop" class="outline-2">
+<h2 id="Let-and-Loop"><span class="section-number-2">7</span> <a href="#Let-and-Loop">Let and Loop</a></h2>
+<div class="outline-text-2" id="text-Let-and-Loop">
+<p>
+Clojure's data structures are immutable &#x2014;one cannot change them in-place&#x2014;
+with <a href="https://hypirion.com/musings/understanding-persistent-vector-pt-1">structural sharing</a> and it has no assignment operator &#x2014;one cannot
+associate a new value with a name without creating a new scope, say via <code>let</code>.
+</p>
+
+<p>
+Let forms allow local names and allow destructuring as functions do.
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #859900; font-weight: bold;">let</span> [x 2
+      [_ y] '(0 1 2 3)] <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">y is 1</span>
+  (+ x y)) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 3</span>
+</pre>
+</div>
+
+
+<div style="column-rule-style: none;column-count: 2;">
+<div class="org-src-container">
+<pre class="src src-clojure"><span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Let's add the first 10 numbers</span>
+(<span style="color: #859900; font-weight: bold;">loop</span> [i   0
+       sum 0]
+    (<span style="color: #859900; font-weight: bold;">if</span> (&lt; i 10)
+      <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8220;update variables and continue&#8221;</span>
+      (<span style="color: #859900; font-weight: bold;">recur</span> (inc i) (+ sum i))
+      <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8220;break, returning this value&#8221;</span>
+        sum))
+<span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; 45</span>
+</pre>
+</div>
+<p>
+<p><br>
+</p>
+
+<p>
+Loops are an in-place form of recursion: <code>(loop [i start] ...(recur i′)...) = (f
+start)</code> where <code>f</code> is <code>(fn [i] ...(f i′)...)</code>. The loop, like the underlying anonymous
+function, can take any number of arguments/initial-bindings.
+</p>
+
+</div>
+</div>
+</div>
+
+<div id="outline-container-Quotes-Quasi-Quotes-and-Unquotes" class="outline-2">
+<h2 id="Quotes-Quasi-Quotes-and-Unquotes"><span class="section-number-2">8</span> <a href="#Quotes-Quasi-Quotes-and-Unquotes">Quotes, Quasi-Quotes, and Unquotes</a></h2>
+<div class="outline-text-2" id="text-Quotes-Quasi-Quotes-and-Unquotes">
+<p>
+Quotes: <code>'x</code> refers to the <i>name</i> rather than the <i>value</i> of <code>x</code>.
+</p>
+
+<ul class="org-ul">
+<li>This is superficially similar to pointers:
+Given <code>int *x = ...</code>, <code>x</code> is the name (address)
+whereas <code>*x</code> is the value.</li>
+<li>The quote simply forbids evaluation; it means <i>take it literally as you see it</i>
+rather than looking up the definition and evaluating.</li>
+<li>Note: <code>'x = (quote x)</code>.</li>
+</ul>
+
+<p>
+Akin to English, quoting a word refers to the word and not what it denotes.
+</p>
+
+<p>
+This lets us treat <i>code</i> as <i>data</i>! E.g., <code>'(+ 1 2)</code> evaluates to <code>(+ 1 2)</code>, a function
+call, not the value <code>3</code>! In general, <code>(eval (quote e)) = e</code> for any expressions <code>e</code>;
+e.g., <code>'(+ 1 2)</code> is <i>data</i> that when evaluated/executed/run yields 3: <code>(eval '(+ 1
+2)) ⇒ 3</code>.
+</p>
+
+<p>
+An English sentence is a list of words; if we want to make a sentence where some
+of the words are parameters, then we use a quasi-quote &#x2013;it's like a quote, but
+allows us to evaluate data if we prefix it with a tilde “ <code>~</code> ”. It's usually the
+case that the quasi-quoted sentence happens to be a function call! In which
+case, we use <code>eval</code> which executes code that is in data form; i.e., is quoted.
+</p>
+
+<p>
+( <i>Macros are essentially functions that return sentences, lists, which may
+happen to contain code.</i> )
+</p>
+
+
+<div style="column-rule-style: none;column-count: 2;">
+<div class="org-src-container">
+<pre class="src src-clojure"><span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Quotes / sentences / data</span>
+'(I am a sentence)
+'(+ 1 (+ 1 1))
+
+<span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Executing data as code ;; &#8658; 3</span>
+(eval '(+ 1 (+ 1 1)))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #859900; font-weight: bold;">def</span> <span style="color: #268bd2;">name</span> <span style="color: #2aa198;">"Jasim"</span>)
+
+<span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">Quasi-quotes: Sentences with a</span>
+<span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">computation, code, in them.</span>
+`(Hello ~name and welcome) <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; '(Hello "Jasim" and welcome)</span>
+`(+ 1 ~(+ 1 1))  <span style="color: #96A7A9; font-style: italic;">;; </span><span style="color: #96A7A9; font-style: italic;">&#8658; '(+ 1 2)</span>
+</pre>
+</div>
+
+
+</div>
+
+
+<p>
+As the final example shows, Lisp treats data and code interchangeably.
+A language that uses the same structure to store data and code is called ‘homoiconic’.
+</p>
+</div>
+</div>
+
+<div id="outline-container-Macros" class="outline-2">
+<h2 id="Macros"><span class="section-number-2">9</span> <a href="#Macros">Macros</a></h2>
+<div class="outline-text-2" id="text-Macros">
+<p>
+<i>&#x2026;when I have time&#x2026;!</i>
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Musa Al-hassy</p>
+<p class="date">Created: 2021-01-12 Tue 10:44</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

@@ -1,0 +1,2062 @@
+* Header                                                     :ignore:
+  :PROPERTIES:
+  :CUSTOM_ID: Header
+  :END:
+#+TITLE: Clojure Reference Sheet
+
+# +SUBTITLE: /Everything is a list!/
+# When we don't provide a date, one is provided for us.
+# +MACRO: URL https://github.com/alhassy/ClojureCheatSheet
+# +MACRO: ShowURL @@latex:{\tiny\hspace{6em}\url{ {{{URL}}} } }@@
+# +AUTHOR: [[http://www.cas.mcmaster.ca/~alhassm/][Musa Al-hassy]] {{{ShowURL}}}
+# +EMAIL: alhassy@gmail.com
+# +DESCRIPTION: This document is written by Musa Al-hassy for his learning in the Winter of 2019.
+# +STARTUP: hideblocks
+# +STARTUP: overview
+#+TODO: TODO ELISP | DONE
+#+OPTIONS: d:nil
+#+INCLUDE: ~/CheatSheet/CheatSheetSetup.org
+
+
+# I use a lot of Unicode, so let's always include a unicode header.
+# (maybe-clone "https://armkeh.github.io/unicode-sty/")
+#+LATEX_HEADER: \usepackage{\string~"/unicode-sty/unicode"}
+#+LATEX_HEADER: \newunicodechar{′}{'}
+
+# blog:header
+# #+TOC: headlines 2
+
+* COMMENT Emacs Setup :ignore:
+  :PROPERTIES:
+  :CUSTOM_ID: Emacs-Setup
+  :END:
+
+#+BEGIN_SRC emacs-lisp
+;; ⟨0⟩
+(use-package clojure-mode)
+(use-package cider)
+(require 'ob-clojure)
+(setq org-babel-clojure-backend 'cider)
+(require 'cider)
+
+;; ⟨1⟩
+;;
+;; (system-packages-install "leiningen")
+;; (shell-command "lein new clojure-examples")
+
+;; ⟨2⟩
+;; Connect to a REPL session
+(cider-jack-in '(:project-dir "~/Dropbox/clojure-examples/"))
+
+;; ⟨3⟩
+;; Wait for the REPL buffer to open up; then just ignore it, C-x 0 in it.
+;; Now we can execute source blocks in org files in that director.
+
+;; ⟨4⟩
+;; It seems trying to send a line ;;ending;; in a comment to the repl crashes.
+#+END_SRC
+
+#+RESULTS:
+: #<process nrepl-server>
+
+#+begin_src clojure :results output
+(print "hiyao")
+#+end_src
+
+#+RESULTS:
+: hiyao
+
+#+begin_src clojure :results value
+(+ 2 1 4 3)
+#+end_src
+
+#+RESULTS:
+|                                 10 |
+| class java.lang.ClassCastException |
+
+For yankpad.org...
+** s_clojure: src for clojure
+   :PROPERTIES:
+   :CUSTOM_ID: s-clojure-src-for-clojure
+   :END:
+#+begin_src clojure
+$0
+#+end_src
+** is_clojure: inline source for clojure
+   :PROPERTIES:
+   :CUSTOM_ID: is-clojure-inline-source-for-clojure
+   :END:
+src_clojure[:exports code]{$1} $0
+
+* LaTeX Setup                                                :ignore:
+  :PROPERTIES:
+  :CUSTOM_ID: LaTeX-Setup
+  :END:
+
+# Removing the red box that appears in "minted" when using unicode.
+# Src: https://tex.stackexchange.com/questions/343494/minted-red-box-around-greek-characters
+#
+#+LATEX_HEADER: \makeatletter
+#+LATEX_HEADER: \AtBeginEnvironment{minted}{\dontdofcolorbox}
+#+LATEX_HEADER: \def\dontdofcolorbox{\renewcommand\fcolorbox[4][]{##4}}
+#+LATEX_HEADER: \makeatother
+
+* Intro                                                :ignore:
+  :PROPERTIES:
+  :CUSTOM_ID: Intro
+  :END:
+/Everything is a list!/
+
+- Functions are first-class values; variables and functions share the same
+  namespace ---“Clojure is a Lisp-1 Language”.
+
+- To find out more about src_clojure[:exports code]{name} execute
+  src_clojure[:exports code]{(doc name)}!
+
+For these notes, I followed the delightful [[https://www.braveclojure.com/foreword/][Clojure for the Brave and True]]; I
+[[https://gist.github.com/yogthos/be323be0361c589570a6da4ccc85f58f][suggest]] starting with [[http://clojurescriptkoans.com/][ClojureScript Koans]]: An interactive question-answer
+approach where you type up (super small) code to progress ;-)
+
+* Primitive Data Structures
+  :PROPERTIES:
+  :CUSTOM_ID: Primitive-Data-Structures
+  :END:
+
+# Naming values with =def=
+Use =def= to bind a name to a value ---this' like CommonLisp's =setq=.
+
+# Use =defn= with =[args]= to define functions; keep reading...
+
+Clojure's data structures are all immutable; that cannot be changed in place.
+
++ Numbers :: Integers, floats, ratios:
+  src_clojure[:exports code]{(printf "%s and %s and %s" -93 1.2 1/5)}
+  :Try:
+   #+BEGIN_SRC clojure :results output
+(printf "%s and %s and %s" -93 1.2 1/5)
+;; ⇒ -93 and 1.2 and 1/5
+#+END_SRC
+   :End:
++ Symbols :: Atomic literals, src_clojure[:exports code]{'hello}. They're like
+  numbers: /They are what they are!/ Unlike strings, the idea is to treat these
+  /literally/ rather than operate on their ‘contents’. They're /first-class names!/
+
+  Closely related, are *keywords*, such as src_clojure[:exports code]{:hello}.
+  In Clojure, these are /not/ symbols since they always evaluate to themselves
+  and cannot act as names.
+
+  It's a /semantic/ difference: With src_clojure[:exports code]{eval}, the symbol
+  src_clojure[:exports code]{'hello} will have whatever value the /name/
+  src_clojure[:exports code]{hello} has; whereas src_clojure[:exports
+  code]{:hello} yields src_clojure[:exports code]{:hello} as its value.
++ Strings :: Enclosed in double-quotes; use =str= to catenate a bunch of lists.
++ Maps/Hashes/Dictionaries/property-lists :: These structures allow you to associate
+  keys/words/properties with values/definitions. /Extremely versatile!/
+
+  + The empty map is ={}=;
+  + The map sending =keyᵢ= to =valueᵢ= is src_clojure[:exports code]{{:key₀ value₀ ... :keyₙ valueₙ}}.
+    #+BEGIN_SRC clojure
+  (def m {:name {:first "Bob" :last "Abe"} :age 10 :act +})
+  (m :age) ;; ⇒ 10
+  (:last (:name m)) ;; ⇒ "Abe"
+  (apply (get m :act) [1 2]) ;; ⇒ 3
+
+  ;; Keys can be anything
+  ({3 40} 3) ;; ⇒ 40
+  #+END_SRC
+
+  + If =m= is a map, use ~(:key m)~ to get the value associated with =:key=.
+  + Since maps are essentially functions, you can use function application
+    syntax: =(m key)=.
+  + Trying to get the value associated to a key /not in/ a map will yield =nil=.
+
+    Three equivalent ways to get the value of =k= in map =m= if it is in =m=, otherwise
+    return default value =d= ---which is optional and defaults to =nil=.
+
+    #+begin_center
+    src_clojure[:exports code]{(get m :k d)},
+    src_clojure[:exports code]{(m :k d)},
+    src_clojure[:exports code]{(:k m d)}
+    #+end_center
+    # | =(get m :k d)=    | =(m :k d)= | =(:k m d)= |
+
+    In particular, observe that keywords =:k= act as functions
+    that lookup a key in a map ---symbols also act as look-up
+    functions.
+  + Starting from the empty map, one can ‘conjoin’ new values:
+    src_clojure[:exports code]{(conj {k v} m)} is the new map that at key =k=
+    yields =v= and at all other keys behaves like =m=.
+  + Alternatively, use src_clojure[:exports code]{(hash-map :key₀ value₀ ... :keyₙ
+    valueₙ)} to make a map and src_clojure[:exports code]{(get m key)} to get
+    the value associated with key =key=.
+
++ Vectors :: (/Append friendly!/) These are like maps but numbers are used to
+  access the values.  E.g., src_clojure[:exports code]{(get [x₀ x₁ ... xₙ] i) =
+  xᵢ} for =i ∶ 0..n=.
+  - Vectors can also be created with src_clojure[:exports code]{(vector x₀ x₁ ... xₙ)}.
+  - Use =conj= to ‘conjoin’ a new element to the /end/ of a vector:
+    src_clojure[:exports code]{(conj xₙ₊₁ [x₀ ... xₙ]) = [x₀ ... xₙ xₙ₊₁]}.
+
++ Lists :: (/Prepend friendly!/) These are like vectors but =conj= adds elements to
+  the /start/ of a list.
+  - =get= doesn't work with lists; use src_clojure[:exports code]{(nth '(x₀ ...
+    xₙ) i) = xᵢ}.
+  - Lists can also be created with src_clojure[:exports code]{(list x₀ x₁ ...
+    xₙ)}.
+
+  For lists, src_clojure[:exports code]{conj} is also known as
+  src_clojure[:exports code]{cons} since it /constructs/ lists by adding elements
+  at the start. The operation to add elements at the end is known as /snoc/, the
+  reverse reading of /cons/; as such, Clojure has both (cons) lists and snoc lists
+  (vectors) as primitive data structures.
+
++ Sets :: Collections of unique values,
+  src_clojure[:exports code]{#{x₀ ... xₙ}} ---duplication is ignored in
+  that
+
+  src_clojure[:exports code]{(conj xs x)} is just =xs= if =x= is already a member of set =x=.
+  - Sets can also be created with
+    src_clojure[:exports code]{(hash-set x₀ x₁ ... xₙ)}.
+  - src_clojure[:exports code]{(contains? xs x)} indicates whether =x= is an element of set =xs=.
+  - Sets are essentially maps where the values are just themselves: @@latex:
+    \newline@@ src_clojure[:exports code]{#{x₀ ... xₙ} = {x₀ x₀ ... xₙ xₙ}}; so you
+    can use any of the three above ways to src_clojure[:exports code]{get}
+    values.
+
+    :Try:
+   #+BEGIN_SRC clojure
+(get #{:a :b} :af)
+(#{1 2} 1)
+#+END_SRC
+   :End:
+
+/Unlike/ many other Lisps, in Clojure maps, vectors, lists, and sets can
+(/optionally/) have their arguments separated by /commas/!
+E.g.,
+src_clojure[:exports code]{(= '(1 2 3) '(1, 2, 3) '(1 2, 3))} is true.
+
+:Try:
+#+begin_src clojure
+(= '(1 2 3) '(1, 2, 3) '(1 2, 3))
+
+(format "a%sf" "bc")
+#+end_src
+
+#+RESULTS:
+| true   |
+| "abcf" |
+:End:
+
+* Sequence & Collection Methods
+  :PROPERTIES:
+  :CUSTOM_ID: Sequence-Collection-Methods
+  :END:
+
+All of Clojure's data structures ---strings, vectors, maps, lists, and sets---
+take part in both the sequence abstraction and the collection abstraction.
+
+The sequence abstraction focuses on the elements, whereas the collection
+abstraction focuses on the structure as a whole.
+
+** The Collection Abstraction
+   :PROPERTIES:
+   :CUSTOM_ID: The-Collection-Abstraction
+   :END:
+*The Collection Abstraction*
+
++ src_clojure[:exports code]{count} ⇒ How many elements does the collection have?
++ src_clojure[:exports code]{empty?} ⇒ Does it have any elements?
++ src_clojure[:exports code]{every?} ⇒ Does every element in the collection satisfy a given predicate?
++ src_clojure[:exports code]{into} ⇒ Insert all the elements from the second collection /into/ the first.
+  - E.g., src_clojure[:exports code]{(into #{} xs)} converts ~xs~ into a set,
+    whereas src_clojure[:exports code]{(into {:a 1} xs)} converts a list ~xs~ of
+    /key-value vector pairs/ into a map but ~:a~ will map to whatever it maps to in
+    ~xs~, if any, or 1 otherwise.
+
+  This is like src_clojure[:exports code]{concat} but it does a collection
+  conversion: The result is the same collection type as the first argument.
+
+  :Try:
+  #+begin_src clojure
+(= {:b 2} (into {} '([:b 2])))
+(cons {:b 2} {:a 1})
+  #+end_src
+
+  #+RESULTS:
+  | true            |
+  | ({:b 2} [:a 1]) |
+  :End:
++ src_clojure[:exports code]{(conj xs x)} ⇒ Insert ~x~ into the collection ~xs~.
+  - For vectors, insert at the /end/.
+  - For lists, insert at the /beginning/.
+  - For sets, insert if it's not already in ~xs~.
+  - For maps, =x= has the shape ={:key value}=, and we update the value of ~:key~ in
+    =xs= to now be associated with =value=.
+
+  This is like =cons= but it /preserves/ the collection type ---whereas =cons= forces
+  it to be a list: src_clojure[:exports code]{(cons x xs) = (cons x (seq xs))}
+  where src_clojure[:exports code]{(seq xs) = (into '() xs)} is discussed below.
+
+  src_clojure[:exports code]{(conj xs x) = (into {} (cons x xs))} for ~xs~ a map.
+
+  =conj= and =into= are essentially the same function, except one takes a varadic
+  number of arguments whereas the other takes a formal sequence for the second
+  argument:
+
+   src_clojure[:exports code]{(conj xs y₀ y₁ ... yₙ) = (into xs (list y₀ y₁ ...
+  yₙ))}
+
+In summary, every collection can be formed from the empty collection ---
+src_clojure[:exports code]{'(), [], {}, #{}} --- and using src_clojure[:exports
+code]{into} to shove new elements /into/ it ---alternatively, /conjoining/ new
+elements with src_clojure[:exports code]{conj}.  Interestingly,
+src_clojure[:exports code]{(into '() xs)} reverses a list ~xs~ but does nothing to
+a vector ~xs~ ---since ~conj~ prepends for lists and appends for vectors.
+
+** The Sequence Abstraction
+   :PROPERTIES:
+   :CUSTOM_ID: The-Sequence-Abstraction
+   :END:
+
+*The Sequence Abstraction*
+
+# Lists, vectors, sets, and maps are all /sequence types/:
+Sequences implement src_clojure[:exports code]{first, rest, cons} and so may use
+the sequence operations src_clojure[:exports code]{map, reduce, filter,
+distinct, group-by, ...}.
+
+Using src_clojure[:exports code]{first} and src_clojure[:exports code]{rest} we
+can always obtain a list from any sequence type; the method to do so is called
+src_clojure[:exports code]{seq} and it's characterised by: src_clojure[:exports
+code]{(seq xs) = (cons (first xs) (seq (rest xs)))}.  For instance, for maps,
+src_clojure[:exports code]{(seq {key₀ val₀ ... keyₙ valₙ}) = '([key₀ val₀] ... [keyₙ
+valₙ])}.  Moreover, whenever a sequence is expected, =seq= is called ---e.g., when
+=map= is called. @@ignore: The =seq= function turns a sequence value into a list;
+for maps it yields a list of key-value vector pairs. @@ This is why =map= always
+returns a list; e.g., src_clojure[:exports code]{(map #(* 3 (second %)) {:a 1 :b
+3 :c 5}) = '(3 9 15)}. Use src_clojure[:exports code]{into} ---discussed
+above--- to convert to a different sequence type.
+
+# Note that strings are converted into a list of their characters.
+# (= '(\a \b \c) (seq "abc"))
+
+Below are a few examples /shown using lists/, but they work with the other
+data-structures too, such as hashmaps!
+
++ src_clojure[:exports code]{(range start end) = (list start (+ start 1) (+
+  start 2) ... (dec end))}.
+
+  src_clojure[:exports code]{start} may be omitted, defaulting to 0.
+
++ src_clojure[:exports code]{(concat '(x₀ ... xₖ) '(xₖ xₖ₊₁ ... xₙ)) = '(x₀ ... xₙ)}.
++ src_clojure[:exports code]{(some p xs) = (p xₖ)} where ~xₖ~ is the first element to satisfy predicate ~p~; or
+  nil otherwise. (/Linear Search/)
+
+  src_clojure[:exports code]{(some #(and (p %) %) xs) = xₖ} is how to get the
+  actual element that satisfies the predicate ~p~, if any.
+  # When the first soln is nil, then this also returns nil and it's all good.
++ src_clojure[:exports code]{map} zips its lists arguments together along a
+  given “zipping function” =f=.
+
+  src_clojure[:exports code]{(nth (map f xs₀ xs₁ ... xsₙ) i)} @@latex:
+  \newline@@ = src_clojure[:exports code]{(f (nth xs₀ i) (nth xs₁ i) ... (nth
+  xsₙ i))}
+
+  For ~f~ being ~vector~, the ~map~ takes some lists (“rows”) and produces a list of
+  lists (“columns”) ---think “matrix transpose” or “tupling”.
+
+   Recall that =:key= act as functions extracting the values associated
+   with key =:key=; whence, ~(map :key ms)~ projects the value of =:key= from
+   each map in =ms=.
++ src_clojure[:exports code]{reduce} replaces every (implicit)
+  src_clojure[:exports code]{cons/conj} with a new binary operation.
+
+  src_clojure[:exports code]{(reduce ⊕ e '(x₀ x₁ ... xₙ)) = (⊕ (⊕ (⊕ (⊕ e x₀) x₁)
+  ...) xₙ)}
+
+  The initial value =e= is optional and may be omitted.
+
+  :Try:
+ #+BEGIN_SRC clojure
+;; (map #(+ %1 %3) '(1 2 3) '(1 2 3) '(1 2 3))
+(= (- (- (- 1 2) 3) 4) (reduce - '(1 2 3 4))) ;; ⇒ true
+ #+END_SRC
+:End:
++ src_clojure[:exports code]{take k '(x₀ x₁ ... xₙ)) = '(x₀ x₁ ... xₖ₋₁)}
++ src_clojure[:exports code]{drop k '(x₀ x₁ ... xₙ)) = '(xₖ xₖ₊₁ ... xₙ)}
++ src_clojure[:exports code]{take-while p '(x₀ x₁ ... xₙ)) = '(x₀ x₁ ... xₖ₋₁)}
+  /where/ ~xₖ~ is the first element to not satisfy the predicate =p=.
++ src_clojure[:exports code]{drop-while p '(x₀ x₁ ... xₙ)) = '(xₖ xₖ₊₁ ... xₙ)}
+  /where/ ~xₖ~ is the first element to not satisfy the predicate =p=.
++ Extensionality: src_clojure[:exports code]{xs = (concat (take-while p xs) (drop-while p xs))}
++ src_clojure[:exports code]{(filter p xs)} is the /largest/ subsequence of ~xs~
+  whose elements all satisfy predicate ~p~; unlike ~take-while~, it process /all/ of
+  ~xs~ rather than stopping at the first value that falsifies the predicate ~p~.
++ src_clojure[:exports code]{sort} sorts a list in ascending order.
++ src_clojure[:exports code]{(sort-by f xs)} sorts the elements of ~xs~ according
+  to the order ‘⊏’ defined by ~x ⊏ y ≡ f x < f y~. E.g., src_clojure[:exports
+  code]{(sort-by count xss)} sorts the sequence of sequences ~xss~ according to
+  their length.
+
+:Try:
+#+begin_src clojure
+; (for [x (range 10) :let [y (inc x)] :when (< y 5)] x)
+; (map list (range 6) (range 10) (repeat :a))
+
+(for [x (range 6)]
+  (* x x))
+
+(for [x₀ (range 6) x₁ (range 3) x₂ (range 2)] (format "%s, %s, %s" x₀ x₁ x₂))
+
+
+#+end_src
+
+#+RESULTS:
+| (0 1 4 9 16 25)                                                                                                                                                                                                                                                                                                                                                           |
+| ("0, 0, 0" "0, 0, 1" "0, 1, 0" "0, 1, 1" "0, 2, 0" "0, 2, 1" "1, 0, 0" "1, 0, 1" "1, 1, 0" "1, 1, 1" "1, 2, 0" "1, 2, 1" "2, 0, 0" "2, 0, 1" "2, 1, 0" "2, 1, 1" "2, 2, 0" "2, 2, 1" "3, 0, 0" "3, 0, 1" "3, 1, 0" "3, 1, 1" "3, 2, 0" "3, 2, 1" "4, 0, 0" "4, 0, 1" "4, 1, 0" "4, 1, 1" "4, 2, 0" "4, 2, 1" "5, 0, 0" "5, 0, 1" "5, 1, 0" "5, 1, 1" "5, 2, 0" "5, 2, 1") |
+
+
+
+#+begin_src clojure
+(map (fn [[x₀ x₁ x₂]] (let [] (format "%s, %s, %s" x₀ x₁ x₂)))
+       (filter (fn [[x₀ x₁ x₂]] (let [] (when true [x₀ x₁ x₂])))
+               (map vector (range 6) (repeat :a) (repeat :b))))
+#+end_src
+
+#+RESULTS:
+| ((0 0 :a) (1 1 :a) (2 2 :a) (3 3 :a) (4 4 :a) (5 5 :a))                         |
+| ("0, :a, :b" "1, :a, :b" "2, :a, :b" "3, :a, :b" "4, :a, :b" "5, :a, :b") |
+
+:End:
+
+There is also /list comprehensions/
+src_clojure[:exports code]{(for [x xs] body) = (map (fn [x] body) xs)};
+more generally, these are “nested for-loops”:
+
+#+begin_src clojure
+  (for [x₀ xs₀ ... xₙ xsₙ :let 𝓁𝒸 :when 𝓌𝒸] body)
+= (map (fn [[x₀ x₁ ... xₙ]] (let 𝓁𝒸 body))
+       (filter (fn [[x₀ x₁ ... xₙ]] (let 𝓁𝒸 (when 𝓌𝒸 [x₀ ... xₙ])))
+               (cartesian-product xs₀ xs₁ ... xsₙ)))
+#+end_src
+Where a supposed src_clojure[:exports code]{cartesian-product} function
+essentially behaves as src_clojure[:exports code]{(for [x₀ xs₀ ... xₙ xsₙ] [x₀ ...
+xₙ])} ---i.e., it returns all vectors src_clojure[:exports code]{vs} where
+src_clojure[:exports code]{(nth vs i)} is an element of src_clojure[:exports
+code]{xsᵢ}.
+
+:Lemma:
++ Say “p is antitonic on xs” when ~p(nth xs i) ⇒ p(nth xs (dec i))~ for all ~i~
+  ---where here, and only here, “⇒” denotes Boolean implication.  This means,
+  there is some indexed element ~xₖ~ such that ~(p xᵢ)~ is false for all ~i ≥ k~ and
+  ~(p xᵢ)~ is true for all ~i < k~; i.e., ~(map p xs)~ is of the shape ~(true true ...
+  true false false ...  false)~.
+
+  # The condition “p xsᵢ ⇒ p xsᵢ₋₁” reads “if p is true at xsᵢ then it's also
+  # true at the preceding element”; i.e., “if p is false at xsᵢ₋₁ then it's
+  # false at xsᵢ” ^_^
+
+  # That is, if ~q~ is false at some ~x~ then it is false for all elements after
+  # it. Equivalently, if ~q~ is true at some ~x~ then it is true for all elements
+  # before it.
+
+  Claim: ~filter~ and ~take-while~ act the same when the predicate is antitonic;
+  and then, ~take-while~ is more efficient.
+
+  Claim: ~(first (filter p xs)) = (first (take-while p xs))~.
+:End:
+* Laziness: “I /thunk/, therefore I'm done!”
+  :PROPERTIES:
+  :CUSTOM_ID: Laziness-I-thunk-therefore-I'm-done
+  :END:
+
+The =map= (and =filter=) function is /lazy/: The iᵗʰ-element of ~(map f xs)~ is computed
+/only/ when it is actually needed. E.g., ~(first (map f xs))~ is ~(f (first xs))~ and
+so the rest of the map is not evaluated at all.
+
+Likewise, ~(def result (map f xs))~ is evaluated nearly instantaneously regardless
+of how big ~xs~ may be: The =map= is computed as elements of ~result~ are accessed.
+If you try to access or “think” of =(nth result i)= then if it is already computed
+---i.e., we have already “thunk” it--- then we return that value, otherwise, we
+compute it and return it.
+
+More accurately, Clojure /chunks/ its computations: When an element is requested,
+it will compute a few elements after it as well since you're likely to request
+them as well. From below, it can be seen that it computes the next 30
+elements.
+#+BEGIN_SRC clojure :results output
+(def result (map #(do (Thread/sleep 100) (* 2 %)) (range 0 100)))
+(time (nth result 1))  ;; ⇒ 2;  Elapsed time: 3270.204959 msecs
+(time (nth result 30)) ;; ⇒ 60; Elapsed time: 0.051002 msecs (Neato!)
+(time (nth result 33)) ;; ⇒ 66; Elapsed time: 3293.824322 msecs
+#+END_SRC
+
+Accessing the first element takes ~3200 milliseconds since Clojure prepared the
+next ~30 elements in case we want to access them next; e.g., in the next line we
+access the 30th element almost instantaneously. After that, we try to access
+an element not yet computed and it and the next ~30 after it are computed.
+
+Note:
++ ~(Thread/sleep 1000)~ ⇒ Sleep/pause for 1second
++ ~(time e)~ ⇒ Evaluate ~e~ and return its value /along/ with a print
+  to standard output indicating how long it took to evaluate ~e~.
+
+#+BEGIN_SRC clojure :results output
+(+ 2 (time (+ 1 2))) ;; ⇒ 5 (Elapsed time: 0.022374 msecs)
+#+END_SRC
+
+
+*Warning: Unused = Unevaluated!*
+#+BEGIN_SRC clojure :results output
+;; Since the map's result in unused, it is not evaluated!
+(do (map print (range 0 100)) (println "bye")) ;; Prints' “bye” only
+;; Use “mapv” which is eager!
+(do (mapv print (range 0 100)) (println "bye")) ;; Prints' “01...100bye” only
+#+END_SRC
+
+*Infinite sequences:*
+src_clojure[:exports code]{(repeat x)} is the infinite sequence that returns ~x~ at every index:
+src_clojure[:exports code]{(nth (repeat x) i) = x} for any /i ≥ 0/.
+
+Evaluating src_clojure[:exports code]{(repeat x)} will /take forever/ since it's
+an infinite list; instead use src_clojure[:exports code]{(take n (repeat x))} to
+get a finite list of length ~n~.
+
+Likewise, src_clojure[:exports code]{(repeatedly f)} generates an infinite
+sequence from the nullary function ~f~.
+#+BEGIN_SRC clojure
+(take 3 (repeatedly (fn [] (rand-int 10)))) ;; ⇒ '(5 9 6)
+(take 2 (repeat "n"))  ;; ⇒ '("n" "n")
+#+END_SRC
+
+You can also use src_clojure[:exports code]{lazy-seq} to treat a sequence lazily.
+#+BEGIN_SRC clojure
+(defn evens
+  ([]  (evens 0))
+  ([n] (cons (* 2 n) (lazy-seq (evens (inc n))))))
+
+(take 3 (evens)) ;; ⇒ '(0 2 4)
+#+END_SRC
+
+** Memoize
+   :PROPERTIES:
+   :CUSTOM_ID: Memoize
+   :END:
+
+ You can memoize a function src_clojure[:exports code]{f} so that if you've
+ already ‘thunk’ it at input src_clojure[:exports code]{a} then anytime
+ src_clojure[:exports code]{(f a)} you get the value /immediately!/
+ #+BEGIN_SRC clojure :results output
+(defn slow [x] (Thread/sleep 1000) x)
+(def fast (memoize slow))
+(time (fast 1)) ;; ⇒ “Think it!” Elapsed time: 1000.529943 msecs
+(time (fast 1)) ;; ⇒ “Already thunk it!” Elapsed time: 0.068761 msecs
+ #+END_SRC
+
+* Conditionals
+  :PROPERTIES:
+  :CUSTOM_ID: Conditionals
+  :END:
+
+Booleans: src_clojure[:exports code]{true} and src_clojure[:exports code]{false}
+  - (Deep structural) equality: src_clojure[:exports code]{(= x y)}.
+  - src_clojure[:exports code]{nil} indicates /no value/.
+    - (/Warning!/ Unlike other Lisps, ~nil ≠ false~ and ~nil ≠ '()~! )
+  - Use src_clojure[:exports code]{nil?} to check if a value is =nil=.
+  - Comparisons: As expected; e.g., src_clojure[:exports code]{(<= x y)} denotes /x ≤ y/.
+
+
+Regarding Boolean operations ---such as src_clojure[:exports code]{and, or,
+if}--- both src_clojure[:exports code]{nil} and src_clojure[:exports code]{false} denote
+/logically false values/; everything else denotes logical truth: src_clojure[:exports code]{(boolean x)}
+returns true exactly when ~x~ is truthy ---i.e., it converts things to Booleans.
+
++ src_clojure[:exports code]{or, and} returns the first truthy / fasley value if
+  any, or the last value otherwise.
++ src_clojure[:exports code]{if} takes *at-most 3* arguments: src_clojure[:exports
+  code]{(if condition thenExpr optionalElseExpr)}
+  - If you want to perform *multiple expressions*, use src_clojure[:exports
+    code]{do} ---this is ~progn~ in CommonLisp.
+  - Note: src_clojure[:exports code]{(if x y) = (if x y nil)};
+    @@latex:\newline@@ better: src_clojure[:exports code]{(when c thenBlock) =
+    (if c (do thenBlock))}.
+    #  =if= yields nil when its third argument is omitted.
+  - src_clojure[:exports code]{(if xs ...)} means “if xs is non-fasley then ...” is
+    akin to C style idioms on linked lists. E.g., src_clojure[:exports code]{(if
+    9 2 4) = 2}.
+
+:try_it_out:
+#+BEGIN_SRC clojure :results output
+(if 2
+  (print (or (+ 1 2 3) (= 3 4)))
+  (do (println "hola")
+  (println (str "x" "y" "z"))))
+#+END_SRC
+:end:
+
+#+begin_parallel 2
+
+Avoid nested if-then-else clauses by using a src_clojure[:exports code]{cond}
+statement --a (lazy) generalisation of switch statements: It sequentially
+evaluates the expressions src_clojure[:exports code]{testᵢ} and performs only
+the action of the first true test; yielding src_clojure[:exports code]{nil} when
+no tests are true. Below we use the keyword src_clojure[:exports code]{:else} to
+/simulate/ a ‘default case’---indeed, any non-falsey value would have sufficed.
+# Or use [[http://www.wilfred.me.uk/blog/2017/03/19/pattern-matching-in-emacs-lisp/][pattern matching]]; which even allows predicates in the case position
+# ---~C-h o~ ;-)
+
+#+columnbreak:
+
+#+BEGIN_SRC clojure
+(cond
+  test₀ expr₀
+  test₁ expr₁
+   ⋮
+  :else defaultExpr)) ;; optional
+#+END_SRC
+
+#+end_parallel
+:Try_it_out:
+#+BEGIN_SRC clojure
+(cond
+  true    "first"
+  (/ 2 0) "crash")
+
+(boolean 3)
+(boolean nil)
+
+(case "he"
+        "" 0
+        "hello" 2)
+#+END_SRC
+
+#+RESULTS:
+| "first"                                  |
+| true                                     |
+| false                                    |
+| class java.lang.IllegalArgumentException |
+
+:End:
+
+Replacing src_clojure[:exports code]{cond} by src_clojure[:exports code]{case x}
+results in an /exhaustive/ case-analysis: If src_clojure[:exports code]{x} is the
+literal expression src_clojure[:exports code]{testᵢ} then yield
+src_clojure[:exports code]{exprᵢ}, if no match happens, crash ---to use a
+default, just have a default value as the final expression, no need to precede
+it by anything. A hybrid of src_clojure[:exports code]{cond} and
+src_clojure[:exports code]{case} is src_clojure[:exports code]{condp}.
+
+# #+latex: \room
+# Hint: If you write a predicate, think of what else you can return besides ~t~; such as
+# a witness to why you're returning truth --all non-nil values denote true after all.
+# E.g., ~(member e xs)~ returns the sublist of ~xs~ that begins with ~e~.
+# # Return more than just the truth!
+#
+:Try_it_out:
+#+BEGIN_SRC clojure
+(member 1 '(2 1 3 5))
+#+END_SRC
+:End:
+
+* Block of Code ~do~ and control flow ~and, or~
+  :PROPERTIES:
+  :CUSTOM_ID: Block-of-Code-do-and-control-flow-and-or
+  :END:
+
+Use the ~do~ function to treat multiple expressions as a single expression. E.g.,
+#+BEGIN_SRC clojure :results output
+(do (println "hello")
+    (def x  (if (< 2 3) 'two-less-than-3))
+    (println (format "%s" x))
+    23) ;; Return value of the “do” block
+#+END_SRC
+
+This’ like curly-braces in C or Java. The difference is that the last expression
+is considered the ‘return value’ of the block.
+
+# Herein, a ‘block’ is a number of sequential expressions which needn't be wrapped
+# with a ~do~ form.
+
++ Lazy conjunction and disjunction ---~and, or~--- can be thought of as /control
+  flow/ first and Boolean operations second:
+    #+BEGIN_SRC clojure
+  (and s₀ ... sₙ e)  ⇒  when all xᵢ are non-falsey, do e
+  (or  s₀ ... sₙ e)  ⇒  when no xᵢ is falsey, do e
+#+END_SRC
++ That is, ~and~ is the /maybe monad/: Perform multiple statements but stop when
+  any of them fails, returns falsey.
++ Likewise, ~or~ performs multiple statements until one of them succeeds, returns
+  non-falsey:
++ We can coerce a statement ~sᵢ~ to returning non-falsey as so: (~do sᵢ true)~.
+  Likewise, coerce falsey by ~(do sᵢ nil)~.
+
+** ELISP COMMENT Jumps / control flow transfer
+   :PROPERTIES:
+   :CUSTOM_ID: COMMENT-Jumps-control-flow-transfer
+   :END:
+
++ Jumps, Control-flow transfer: Perform multiple statements and decide when and where you would like to stop. This' akin to C's ~goto~'s; declare a label with ~catch~ and goto it with ~throw~.
+  - ~(catch 'my-jump bodyBlock)~ where the body may contain ~(throw 'my-jump returnValue)~;
+  the value of the catch/throw is then ~returnValue~.
+  - Useful for when the ~bodyBlock~ is, say, a loop.
+    Then we may have multiple ~catch~'s with different labels according to the nesting of loops.
+    * Possibly informatively named throw symbol is ~'break~.
+  - Using name ~'continue~ for the throw symbol and having such a catch/throw as /the body of a loop/
+    gives the impression of continue-statements from Java.
+  - Using name ~'return~ for the throw symbol and having such a catch/throw as the body of a function
+    definition gives the impression of, possibly multiple, return-statements from Java
+    --as well as ‘early exits’.
+  - Simple law: ~(catch 'it s₀ s₁ ... sₖ (throw 'it r) sₖ₊₁ ... sₖ₊ₙ) = (progn s₀ s₁ ... sₖ r)~.
+    * Provided the ~sᵢ~ are simple function application forms.
+
++ ~and, or~ can be thought of as instance of catch/throw, whence they are control flow
+  first and Boolean operations second.
+    #+BEGIN_SRC clojure
+  (and s₀ ... sₙ e)  ⇒  when all xᵢ are true, do e
+  (or  s₀ ... sₙ e)  ⇒  when no xᵢ is true, do e
+#+END_SRC
+
+* Functions
+  :PROPERTIES:
+  :CUSTOM_ID: Functions
+  :END:
+
+#+latex: {\color{white}.}\vspace{-1em}
+Functions are (/unexceptional/) data:
+#+begin_parallel
+#+BEGIN_SRC clojure :results value
+;; Add numbers
+(+ 1 2 3) ;; ⇒ 6
+#+END_SRC
+
+#+BEGIN_SRC clojure :results value
+;; Apply a function to each number
+(map inc [2 4 6]) ;; ⇒ (3 5 7)
+#+END_SRC
+#+end_parallel
+
+Function invocation: ~(f x₀ x₁ ... xₙ)~. E.g., ~(+ 3 4)~ or ~(print "hello")~.
+
+  - Clojure is /strict/: In a function call, all arguments are evaluated *before* the
+    function is executed. Besides function calls, there are /special forms/ which are
+    ‘special’ since they don't always evaluate all of their operands; e.g., =if=,
+    =when=, and macros such as =def=. There are also ‘lazy collection’ types.
+
+  - Only prefix invocations means we can use ~-,+,*~ in /names/
+    since ~(f+*- a b)~ is parsed as applying function ~f+*-~ to arguments ~a~ and ~b~.
+    # Having infix notation, as in “a - b”, is what renders names “a-b”
+    # from being parsed correctly. Lisp does not make use of infix names,
+    # so this is a non-issue. Interestingly Agda allows +-* in names and infix!
+
++ Function definition:
+  #+BEGIN_SRC clojure :results output
+(defn my-function
+  "This functions performs task ..."      ;; documentation, optional
+  [arg₀ arg₁ & more]                    ;; header, signature
+  (str arg₀ arg₁ (nth more 3)))         ;; body, instructions
+#+END_SRC
+
+  - The *return value* of the function is the result of the last expression executed.
+  - The documentation string may indicate the return type, among other things.
+     #+BEGIN_SRC clojure :results output
+(doc my-function) ;; ⇒ See signature and docstring
+#+END_SRC
+   # ~(doc f)~ prints (to condole) the documentation for a variable/function ~f~.
+  - In function definition, use =&= to make a function take /any extra/ number of
+    arguments; it must come at the end and it is treated as a list in the function
+    body. This is known as a /rest parameter/.
+
+    #+BEGIN_SRC clojure
+(my-function "x" "y" "a" "b" "c" "d") ;; ⇒ "xyd"
+#+END_SRC
+
+** Arity Overloading
+   :PROPERTIES:
+   :CUSTOM_ID: Arity-Overloading
+   :END:
+
+Functions also support *arity overloading*, which act as a way to support default
+arguments.
+#+begin_parallel 2
+#+BEGIN_SRC clojure
+(defn doit
+  ([x y z]
+    (+ x y z))
+  ([x y]
+     ;; default value for z
+    (doit x y 666))
+  ([x]
+    ;; Completely different behaviour
+    ;; when y,z omitted
+    (* 7 x)))
+#+END_SRC
+#+columnbreak:
+#+BEGIN_SRC clojure
+(doit 1 2 3) ;; ⇒ 6
+(doit 1 2)   ;; ⇒ 669
+(doit 1)     ;; ⇒ 7
+#+END_SRC
+#+end_parallel
+
+** Runtime Polymorphism; Arbitrary dispatch
+   :PROPERTIES:
+   :CUSTOM_ID: Runtime-Polymorphism-Arbitrary-dispatch
+   :END:
+Instead of dispatching/choosing function definitional clauses according to
+arity, some language also allow dispatch according to argument type; Clojure
+goes further by /dispatching along the result of an arbitrary function of the
+arguments./ These functions are called /multimethods/; they are defined by
+src_clojure[:exports code]{defmulti} which takes their name and the dispatch
+function, then each overloaded method is defined independently using
+src_clojure[:exports code]{defmethod} which takes the multimethod name, the
+dispatch value, and the function body.
+
+#+begin_src clojure
+;; “doit” is an overloaded method, dispatched along
+;; the “:kind” value of the 1ˢᵗ arg, being a hashmap,
+;; AND along the length of the second argument, being a sequence.
+;; That is, the dispatch value is a vector of length 2.
+(defmulti  doit (fn [x y] [(:kind x) (count y)]))
+
+;; Here are three boring implementations, along the dispatch value
+(defmethod doit [:fruit  5] [x y] :one)
+(defmethod doit [:fruit  4] [x y] :two)
+(defmethod doit [:veggie 4] [x y] :three)
+
+;; Optional default method when nothing matches
+(defmethod doit :default [x y] x)
+
+;; Example calls
+(doit {:kind :fruit  :age 10} "hola!") ;; ⇒ :one
+(doit {:kind :veggie :age 10} "hola!") ;; ⇒ the 1ˢᵗ arg
+      ;; ⇒ Without the default method, this crashes!
+#+end_src
+
+/Multimethods are another way to define ordinary functions, and so can be used
+wherever a function is used./ Such functions could be defined using
+src_clojure[:exports code]{condp} to dispatch along the appropriate
+implementation; but this is more difficult to maintain as more alternatives are
+added, whereas the src_clojure[:exports code]{defmethod} approach is a nice
+/separation of concerns/ ---also known as [[https://stackoverflow.com/questions/62057461/what-are-the-benefits-of-using-multimethods-instead-of-cond-in-clojure][open-closed principle]].
+
+** You can also /destructure/ parameters
+   :PROPERTIES:
+   :CUSTOM_ID: You-can-also-destructure-parameters
+   :END:
+You can also /destructure/ parameters ---lists and maps are discussed below.
+#+BEGIN_SRC clojure
+(defn doit2
+  [ [x y &zs] ;; The first argument is a list/vector consisting
+              ;; of at least 2 values, say x and y, then
+              ;; followed by the list/vector zs
+
+    {w :w}   ;; The second argument is a map;
+  ]          ;; Let w denote the value of key :w in the map.
+
+  (+ y (or w 1))) ;; In-case :w is not in the map, use 1 as default.
+
+(doit2 [1 2 3 4] {:v 5 :w 6}) ;; ⇒ 7
+;; (doit2 [1] {:v 5 :w 6}) ;; ⇒ Error: First argument too short!
+#+END_SRC
+
+** Anonymous functions
+   :PROPERTIES:
+   :CUSTOM_ID: Anonymous-functions
+   :END:
+
+Anonymous functions: ~(fn [arg₀ ... argₖ] bodyHere)~; as usual, you can also
+destructure arguments and have rest parameters.
+#+begin_parallel 2
+#+BEGIN_SRC clojure
+;; make then later invoke
+(def my-f (fn [x y] (+ x y)))
+(my-f 1 2) ;; ⇒ 3
+
+;; make and immediately invoke
+((fn [x y] (+ x y)) 1 2) ;; ⇒ 3
+#+END_SRC
+#+columnbreak:
+#+BEGIN_SRC clojure
+;; Super terse notation
+(map #(* % 2) [1 2 3]) ;; ⇒ [2 4 6]
+#+END_SRC
+The anonymous function =#(...%i...)= is a function where =%i= refers to the /i/-th
+argument; =%= is equivalent to =%1= and =%&= refers to the rest parameter.
+#+end_parallel
+
+# +latex: \vspace{-1em}
+:TryIt:
+#+BEGIN_SRC clojure
+((fn [x y] x) 1 2) ;; ⇒ 1
+
+(def my-second (fn [[x y z]] y))
+(my-second [1 2 3]) ;; ⇒ 2
+
+(map #(* % 2) [1 2 3]) ;; ⇒ [2 4 6]
+#+END_SRC
+:End:
+
+** Keyword / named arguments
+   :PROPERTIES:
+   :CUSTOM_ID: Keyword-named-arguments
+   :END:
+  /Keyword/named arguments/ = rest parameters + (hash)maps + destructuring.
+  #+begin_src clojure
+(defn f [a & {:keys [b c d] :or {c 7 d 11}}] (list a b c d))
+#+end_src
+
+Huh? ~f~ has a required argument, ~a~, followed by a rest parameter (~&~), that we
+destructure into a hashmap ~{...}~, whose ~:keys~ /contain at least/ ~b, c, d~ ---~:or~, if
+the key ~c~ is not there then use 7 as /default/, and likewise use 11 as default for
+~d~.
+#+begin_src clojure
+;; (f)                   ⇒ Error, “a” is a required positional argument!
+(f 2) ;;                            ⇒ '(2 nil 7 11)
+(f 2 :d 4) ;;                       ⇒ '(2 nil 7 4)
+(f 2 :c 5 :b 3 :d 7) ;;             ⇒ '(2 3 5 7)
+(f 2 :ignored 99 :whatever "ok") ;; ⇒ '(2 nil 7 11)
+  #+end_src
+
+** Higher order functions
+   :PROPERTIES:
+   :CUSTOM_ID: Higher-order-functions
+   :END:
+
+ *Higher order functions*
+
+ + src_clojure[:exports code]{apply} unpacks a sequence so it can be passed to a function that expects
+   a rest parameter. For any /k ≥ 0/,
+   #+begin_center
+   src_clojure[:exports code]{(apply f x₀ x₁ ... xₖ₋₁ '(xₖ xₖ₊₁ ... xₙ)) = (f x₀ x₁ ... xₙ)}
+   #+end_center
+
+ + If src_clojure[:exports code]{f} is a function of src_clojure[:exports
+   code]{n} arguments, then src_clojure[:exports code]{(partial f x₀ x₁ ... xₖ₋₁)} is the
+   function ~f~ with it's first =k= arguments already given and the remaining ~n - k~
+   elements not yet given.
+   #+begin_center
+   src_clojure[:exports code]{(partial f x₀ x₁ ... xₖ₋₁) = #(apply f x₀ x₁ ... xₖ₋₁ %&)}
+   #+end_center
+
+ + src_clojure[:exports code]{(complement p) = #(not (apply p %&))}
+
+ + src_clojure[:exports code]{(identity x) = x}
+
+ + src_clojure[:exports code]{(comp f₁ f₂ ... fₙ) = #(f₁ (f₂ (... (apply fₙ %&))))};
+   if /n = 0/, this is just src_clojure[:exports code]{identity}.
+
+   :Try:
+    #+BEGIN_SRC clojure
+((comp #(/ % 2.0) - inc *) 2 3) ;; ⇒ (/ (- (inc (* 2 3))) 2) ⇒ -3.5
+((comp) 10) ;; ⇒ (identity 10) ⇒ 10
+ #+END_SRC
+   :End:
+
+* Let and Loop
+   :PROPERTIES:
+   :CUSTOM_ID: Let-and-Loop
+   :END:
+
+Clojure's data structures are immutable ---one cannot change them in-place---
+with [[https://hypirion.com/musings/understanding-persistent-vector-pt-1][structural sharing]] and it has no assignment operator ---one cannot
+associate a new value with a name without creating a new scope, say via =let=.
+
+Let forms allow local names and allow destructuring as functions do.
+#+BEGIN_SRC clojure
+(let [x 2
+      [_ y] '(0 1 2 3)] ;; y is 1
+  (+ x y)) ;; ⇒ 3
+#+END_SRC
+
+#+begin_parallel 2
+#+BEGIN_SRC clojure
+;; Let's add the first 10 numbers
+(loop [i   0
+       sum 0]
+    (if (< i 10)
+      ;; “update variables and continue”
+      (recur (inc i) (+ sum i))
+      ;; “break, returning this value”
+        sum))
+;; ⇒ 45
+#+END_SRC
+#+columnbreak:
+
+Loops are an in-place form of recursion: ~(loop [i start] ...(recur i′)...) = (f
+start)~ where ~f~ is ~(fn [i] ...(f i′)...)~. The loop, like the underlying anonymous
+function, can take any number of arguments/initial-bindings.
+#+end_parallel
+
+# =recur= can also be used in function definitions to request improved
+# performance via tail call optimisation.
+
+* spacing COMMENT newpage                                                    :ignore:
+  :PROPERTIES:
+  :CUSTOM_ID: spacing-COMMENT-newpage
+  :END:
+#+latex: \columnbreak
+* Quotes, Quasi-Quotes, and Unquotes
+  :PROPERTIES:
+  :CUSTOM_ID: Quotes-Quasi-Quotes-and-Unquotes
+  :END:
+
+Quotes: ~'x~ refers to the /name/ rather than the /value/ of ~x~.
+
+  - This is superficially similar to pointers:
+    Given ~int *x = ...~, ~x~ is the name (address)
+    whereas ~*x~ is the value.
+  - The quote simply forbids evaluation; it means /take it literally as you see it/
+    rather than looking up the definition and evaluating.
+    :TryItOut:
+    #+BEGIN_SRC clojure
+(def this 'hello)
+(def that this)
+
+;;  this  → hello
+;; 'this  → this
+;;  that  → hello
+;; 'that  → that
+(list this that)
+#+END_SRC
+
+#+RESULTS:
+| #'user/this   |
+| #'user/that   |
+| (hello hello) |
+
+    :End:
+  - Note: ~'x = (quote x)~.
+
+:Try_it_out:
+#+BEGIN_SRC clojure
+; 'x = (quote x)
+(= 'x (quote x))
+
+; ''x ≠ 'x
+(= 'x ''x)
+
+(eval '(+ 1 2))
+#+END_SRC
+
+#+RESULTS:
+| true  |
+| false |
+| 3     |
+
+:End:
+
+  #+latex: \room
+Akin to English, quoting a word refers to the word and not what it denotes.
+
+This lets us treat /code/ as /data/! E.g., ~'(+ 1 2)~ evaluates to ~(+ 1 2)~, a function
+call, not the value ~3~! In general, ~(eval (quote e)) = e~ for any expressions ~e~;
+e.g., ~'(+ 1 2)~ is /data/ that when evaluated/executed/run yields 3: ~(eval '(+ 1
+2)) ⇒ 3~.
+
+#+latex: \room
+
+An English sentence is a list of words; if we want to make a sentence where some
+of the words are parameters, then we use a quasi-quote --it's like a quote, but
+allows us to evaluate data if we prefix it with a tilde “ =~= ”. It's usually the
+case that the quasi-quoted sentence happens to be a function call! In which
+case, we use ~eval~ which executes code that is in data form; i.e., is quoted.
+
+#+latex: \room
+( /Macros are essentially functions that return sentences, lists, which may
+happen to contain code./ )
+
+#+begin_parallel 2 :bar t
+#+BEGIN_SRC clojure
+;; Quotes / sentences / data
+'(I am a sentence)
+'(+ 1 (+ 1 1))
+
+;; Executing data as code ;; ⇒ 3
+(eval '(+ 1 (+ 1 1)))
+#+END_SRC
+
+#+BEGIN_SRC clojure
+(def name "Jasim")
+
+;; Quasi-quotes: Sentences with a
+;; computation, code, in them.
+`(Hello ~name and welcome)
+     ;; ⇒ '(Hello "Jasim" and welcome)
+`(+ 1 ~(+ 1 1))  ;; ⇒ '(+ 1 2)
+#+END_SRC
+
+#+end_parallel
+
+As the final example shows, Lisp treats data and code interchangeably.
+A language that uses the same structure to store data and code is called ‘homoiconic’.
+
+:Try:
+#+BEGIN_SRC clojure
+(def name "Jasim")
+
+;; Quasi-quotes: Sentences with a
+;; computation, code, in them.
+`(Hello ~name and welcome)
+#+END_SRC
+
+#+RESULTS:
+| #'user/name                                        |
+| (user/Hello "Jasim" clojure.core/and user/welcome) |
+
+:End:
+
+* Macros
+  :PROPERTIES:
+  :CUSTOM_ID: Macros
+  :END:
+
+  /...when I have time...!/
+
+* COMMENT Clojure for the brave and true, notes :macros:
+  :PROPERTIES:
+  :CUSTOM_ID: COMMENT-Clojure-for-the-brave-and-true-notes
+  :END:
+;; The map function is not to be confused with the map data structure!
+
+
+** DONE §3 do things
+   :PROPERTIES:
+   :CUSTOM_ID: 3-do-things
+   :END:
+
+ + Consistent structure: ~(operator operand₀ operand₁ ... operand)~
+   - Other languages use a mixture of infix notation and commas.
+
+ + println ⇒ print to standard output
+** §8 Writing Macros
+   :PROPERTIES:
+   :CUSTOM_ID: 8-Writing-Macros
+   :END:
+
+ Clojure has a programmatic macro system which allows the compiler to be extended by user code. Macros can be used to define syntactic constructs which would require primitives or built-in support in other languages. Many core constructs of Clojure are not, in fact, primitives, but are normal macros.
+
+ Some macros produce simple combinations of primitive forms. For example, when combines if and do:
+
+ Other macros re-arrange forms in useful ways, like the -> macro, which recursively inserts each expression as the first argument of the next expression:
+
+ + =if= is a special form, but =when, cond, or, and= are macros.
+
+ #+BEGIN_SRC clojure
+;; (macroexpand '(if-not c x y)) ;; ⇒ '(if (not c) x y)
+
+;; This macro is nice when you need to calculate something big. And you need
+;; to use the result but only when it's true:
+;; (macroexpand '(if-let [val c] x y)) ;; ⇒ '(let [val c] (if val x y))
+
+
+; (macroexpand '(when c e₀ e₁ ... eₙ)) ;; ⇒ '(if c (do e₀ e₁ ... eₙ))
+; (macroexpand '(when-not c e₀ e₁ ... eₙ)) ;; ⇒ (if c nil (do e₀ e₁ ... eₙ))
+;; (macroexpand '(when-let [val c] e₀ ... eₙ)) ;; ⇒ '(let [val c] (when val e₀ ... eₙ))
+
+; (defmacro unless [& args] `(when-not ~@args))
+; (macroexpand '(cond c₀ e₀ ... ... cₙ eₙ)) ;; ⇒ '(if c₀ e₀ (cond ... ... cₙ eₙ))
+; (macroexpand '(or e₀ e₁ ... eₙ)) ;; ⇒ '(let [it e₀] (if it it (or e₁ ... eₙ)))
+; (macroexpand '(and e₀ e₁ ... eₙ)) ;; ⇒ '(let [it e₀] (if it (and e₁ ... eₙ) it))
+
+;; Ignores body, yields nil
+;; [Not completely ignored; the Lisp reader still tries to read it,
+;; so it must be well-formed lisp. ]
+;; (macroexpand '(comment e₀ ... eₙ)) ;; ⇒ nil
+
+(macroexpand '(when-first [x xs] e₀ ... eₙ))
+;; ⇒ (when xs (let [x (first xs)] e₀ ... eₙ))
+ #+END_SRC
+
+ #+RESULTS:
+ | let* | (temp__5735__auto__ (clojure.core/seq xs)) | (clojure.core/when temp__5735__auto__ (clojure.core/let (xs__6292__auto__ temp__5735__auto__) (clojure.core/let (x (clojure.core/first xs__6292__auto__)) e₀ ... eₙ))) |
+
+ :MoreMacros:
+ + The following are also macros: =defn, defmacro, defrecord, defstruct, deftype, assert, case, defmethod
+   # Their elaborations are a bit much.
+
+ defmethod
+ Creates and installs a new method of multimethod associated with dispatch-value.
+
+ --------------------------------------------------------------------------------
+
+ dotimes
+ macro
+ Usage: (dotimes bindings & body)
+ bindings => name n
+
+ Repeatedly executes body (presumably for side-effects) with name
+ bound to integers from 0 through n-1.
+ Added in Clojure version 1.0
+ Source
+
+ doto
+ macro
+ Usage: (doto x & forms)
+ Evaluates x then calls all of the methods and functions with the
+ value of x supplied at the front of the given arguments.  The forms
+ are evaluated in order.  Returns x.
+
+ for
+ macro
+ Usage: (for seq-exprs body-expr)
+ List comprehension. Takes a vector of one or more
+  binding-form/collection-expr pairs, each followed by zero or more
+  modifiers, and yields a lazy sequence of evaluations of expr.
+  Collections are iterated in a nested fashion, rightmost fastest,
+  and nested coll-exprs can refer to bindings created in prior
+  binding-forms.  Supported modifiers are: :let [binding-form expr ...],
+  :while test, :when test.
+
+ (take 100 (for [x (range 100000000) y (range 1000000) :while (< y x)] [x y]))
+
+ while
+ macro
+ Usage: (while test & body)
+ Repeatedly executes body while test expression is true. Presumes
+ some side-effect will cause test to become false/nil. Returns nil
+ Added in Clojure version 1.0
+
+ --------------------------------------------------------------------------------
+
+ ->
+ macro
+ Usage: (-> x & forms)
+ Threads the expr through the forms. Inserts x as the
+ second item in the first form, making a list of it if it is not a
+ list already. If there are more forms, inserts the first form as the
+ second item in second form, etc.
+ http://clojuredocs.org/clojure.core/-%3E
+
+ ->>
+ macro
+ Usage: (->> x & forms)
+ Threads the expr through the forms. Inserts x as the
+ last item in the first form, making a list of it if it is not a
+ list already. If there are more forms, inserts the first form as the
+ last item in second form, etc.
+
+ as->
+ macro
+ Usage: (as-> expr name & forms)
+ Binds name to expr, evaluates the first form in the lexical context
+ of that binding, then binds name to that result, repeating for each
+ successive form, returning the result of the last form.
+
+ some->
+ macro
+ Usage: (some-> expr & forms)
+ When expr is not nil, threads it into the first form (via ->),
+ and when that result is not nil, through the next etc
+ Added in Clojure version 1.5
+ Source
+
+ some->>
+ macro
+ Usage: (some->> expr & forms)
+ When expr is not nil, threads it into the first form (via ->>),
+ and when that result is not nil, through the next etc
+
+ --------------------------------------------------------------------------------
+
+ time
+ macro
+ Usage: (time expr)
+ Evaluates expr and prints the time it took.  Returns the value of
+ expr.
+
+ --------------------------------------------------------------------------------
+
+ cond
+ macro
+ Usage: (cond & clauses)
+ Takes a set of test/expr pairs. It evaluates each test one at a
+ time.  If a test returns logical true, cond evaluates and returns
+ the value of the corresponding expr and doesn't evaluate any of the
+ other tests or exprs. (cond) returns nil.
+ Added in Clojure version 1.0
+ Source
+
+ cond->
+ macro
+ Usage: (cond-> expr & clauses)
+ Takes an expression and a set of test/form pairs. Threads expr (via ->)
+ through each form for which the corresponding test
+ expression is true. Note that, unlike cond branching, cond-> threading does
+ not short circuit after the first true test expression.
+ Added in Clojure version 1.5
+ Source
+
+ cond->>
+ macro
+ Usage: (cond->> expr & clauses)
+ Takes an expression and a set of test/form pairs. Threads expr (via ->>)
+ through each form for which the corresponding test expression
+ is true.  Note that, unlike cond branching, cond->> threading does not short circuit
+ after the first true test expression.
+ Added in Clojure version 1.5
+ Source
+
+ condp
+ macro
+ Usage: (condp pred expr & clauses)
+ Takes a binary predicate, an expression, and a set of clauses.
+ Each clause can take the form of either:
+
+ test-expr result-expr
+
+ test-expr :>> result-fn
+
+ Note :>> is an ordinary keyword.
+
+ For each clause, (pred test-expr expr) is evaluated. If it returns
+ logical true, the clause is a match. If a binary clause matches, the
+ result-expr is returned, if a ternary clause matches, its result-fn,
+ which must be a unary function, is called with the result of the
+ predicate as its argument, the result of that call being the return
+ value of condp. A single default expression can follow the clauses,
+ and its value will be returned if no clause matches. If no default
+ expression is provided and no clause matches, an
+ IllegalArgumentException is thrown.
+
+ :End:
+
+ #+RESULTS:
+ : '(do (clojure.core/defn name ((&form &env args) body)) (. (var name) (setMacro)) (var name))
+
+ =defmacro= works almost exactly like =defn= ---with the main exception being
+ that it takes ASTs and returns ASTs--- and so supports multiple-arity bodies
+ and destructuring.
+
+ 1. Macros often require quoted expressions to get un-evaluated ASTs.
+ 2. One needs to be careful about the difference between a /symbol/ and its
+    /value/.
+
+ Suppose we want to print an expression along with its value.
+ 1. ~(let [result expression] (println result) result)~
+    - Does not work
+    - Macros are AST-to-AST functions
+    - Thus, we need to return a list of symbols!
+ 2. =`(let [result ~expression] (println result) result)=
+    - We make a list of /symbols/, but we want to place =expression= /in-place/
+      in that list.
+    - That is, we have an AST form where =expression= is replaced by the value
+      that is given.
+
+ 3. Whenever a tilde appears within a syntax-quoted form, the syntax quote’s
+    power to return unevaluated, fully namespaced forms disappears.
+
+    If you’re familiar with string interpolation, you can think of syntax
+    quoting/unquoting similarly. In both cases, you’re creating a kind of
+    template, placing a few variables within a larger, static structure.
+
+    "Churn your butter, #{name}!"
+    ⇒ This is a string, where the /value/ of =name= is inserted literately.
+
+ 4. Consider the following subtlety:
+    - =(defmacro show₀ [expr] `(println ~expr))=
+      + ⇒ Now =(show₀ expr)= reduces to =(println expr)=, which evaluates =expr=
+            and prints its value.
+
+    - =(defmacro show₁ [expr] `(println (quote ~expr))=)
+      + ⇒ Now =(show₁ expr)= reduces to =(println (quote expr))=,
+         which does /not/ evaluate =expr= then prints the list =(quote expr)=.
+
+ 5. That is: Use =(quote ~arg)= if you want to keep =arg= as an AST/symbol; otherwise
+    =~arg= if you only want the /value/ of =arg=.
+
+ 6. And if you want your macro to return multiple forms for Clojure to evaluate,
+    make sure to wrap them in a =do=.
+
+
+ Better imp: https://armkeh.github.io/principles-of-programming-languages/homework/h8.html#Part-0.2:-A-new-special-form-to-automate-visualisation-of-the-stack
+ #+BEGIN_SRC clojure :results output
+(defmacro show
+  [expression]
+  `(loop ['xs (quote ~expression)]
+     (println 'xs)
+     (recur (rest 'xs))))
+
+;; (println (macroexpand (show 1)))
+
+(loop [i 1 xs '(+ (- 2 1) (* 3 4))]
+  (println " " xs)
+  (when-not (= i 3)
+    (println (format "=   { Evaluating argument %s: %s } " i (nth xs i)))
+    (recur (inc i)
+     (concat (take i xs)
+              (concat (list (eval (nth xs i)))
+                      (drop (inc i) xs))))))
+(println (format "=   { Evaluating top form } "))
+(println " " (eval '(+ (- 2 1) (/ 7 2) (* 3 4))))
+
+;; (show (+ 1 (* 2 3)))
+ #+END_SRC
+
+ #+RESULTS:
+ :   (+ (- 2 1) (* 3 4))
+ : =   { Evaluating argument 1: (- 2 1) }
+ :   (+ 1 (* 3 4))
+ : =   { Evaluating argument 2: (* 3 4) }
+ :   (+ 1 12)
+ : =   { Evaluating top form }
+ :   33/2
+
+
+
+ Gensyms create new, unique, symbols and are thus useful to avoid
+ variable capture, among other things ---such as needing names.
+ This is so useful that auto-gensyms exist: Any name ending in a “#”
+ is automatically a gensym'd name:
+
+ #+begin_src clojure
+(list `,hola#  'OR (gensym 'hola))
+;; '(hola__6398__auto__  OR  hola6401 )
+ #+end_src
+
+ Gensym isn't really anything different than what you'd do in Java with new Symbol("foo");. The interning of symbols is what's actually more interesting (but not at all unique). Intern is like a factory method for symbols, where you can get the same one out if you created a similar one earlier; gensym is like a constructor where you always get something new.
+
+ With Common Lisp macro system it's possible to make more restrictive macro
+ systems similar to Scheme
+ [[http://www.r6rs.org/final/html/r6rs/r6rs-Z-H-14.html#node_sec_11.19][syntax-rules]]  and [[http://www.r6rs.org/final/html/r6rs-lib/r6rs-lib-Z-H-13.html][syntax-case]].
+
+  hygienic approach, meaning variables introduced behave as if they are made with gensym.
+ http://community.schemewiki.org/?hygiene-versus-gensym
+
+ I think I understand this now. I didn't understand the real difference between macros and functions and why variables in a macro can't be as carefully scoped as in a function. In a function, you are free to name lexical variables whatever you want because you are just dealing with a reference to a value, and changing it's name doesn't change it's value. A macro's arguments aren't variables containing values, they are containing code. The names of the expressions within that code are not arbitrary, they come from the environment of the macro and determine it's production. – michaelAdam May 21 '15 at 17:14
+ 1
+
+ @michaelAdam Yes, and since CL doesn't have hygiene automatically every symbol you introduce, eg. to make a temporary variable, has the potential to shadow or interfere with the lexical scope of the place the macro gets used. gensym guarantees a unique symbol that you can use to ensure the hygiene of the macro.
+
+ (defvar test 3)
+ (symbol-function 'test)
+
+ (setq it (gensym "ga"))
+ (symbol-value 'tf)
+
+ (getf '(:hola 1) :hola )
+
+ (setf (symbol-function :hola) '+)
+
+ (:hola 3 4 5)
+
+ (defun eval/keyword-as-function (form &optional lexical)
+  (when (keywordp (car form)) (message "noice")))
+
+ (advice-add 'eval :before-until 'eval/keyword-as-function)
+
+** COMMENT Misc macro
+   :PROPERTIES:
+   :CUSTOM_ID: COMMENT-Misc-macro
+   :END:
+
+ #+BEGIN_SRC clojure :results output
+(defmacro trace [e]
+;;  [op & args]
+;;  `(~op (map 'trace (list ~@args))) ;; useful to know my initial failure
+
+;; works!
+;;    (if (list? e) `(~(first e) ~@(map #(list 'trace %) (rest e)))
+;;        e)
+
+    (if (list? e)
+      (list 'loop ['thusfar `(quote ~e)]
+         '(println thusfar)
+         '(when thusfar (recur (drop 1 thusfar))))
+        e))
+
+; (println (macroexpand '(trace (+ 1 (* 2 3)))))
+; (trace (+ 1 (* 2 (- 3 4))))
+; (trace (+ 1 2))
+; (println "a" (apply str (take 3 (repeat " "))) "b")
+ #+END_SRC
+
+ #+RESULTS:
+ : (loop* [thusfar (quote (+ 1 (* 2 3)))] (println thusfar) (when thusfar (recur (drop 1 thusfar))))
+
+ #+BEGIN_SRC clojure :results output
+(loop [xs '(1 2 3)]
+  (print xs)
+  (recur (drop 1 xs)))
+ #+END_SRC
+
+ #+RESULTS:
+ | 1 | 2 |
+
+ nth ⇒ Returns the value at the index. get returns nil if index out of
+ bounds, nth throws an exception unless not-found is supplied.  nth
+ also works for strings, Java arrays, regex Matchers and Lists, and,
+ in O(n) time, for sequences.
+
+ ;; it is tempting to try an index on a list
+ (get '(a b c) 1)
+ ;;=> nil
+
+ ;; but you should use nth
+ (nth '(a b c) 1)
+ ;;=> b
+** Macros clj
+   :PROPERTIES:
+   :CUSTOM_ID: Macros-clj
+   :END:
+
+   Macros let us add new syntax and let us transform code at the syntactic level.
+
+ #+BEGIN_SRC clojure
+(defmacro backwards
+  [form]
+  (reverse form))
+
+(backwards (" backwards" " am" "I" str))
+; => "I am backwards"
+ #+END_SRC
+
+ #+RESULTS:
+ : #'clojure-examples.core/backwards"I am backwards"
+
+ The backwards macro allows Clojure to successfully evaluate the expression ("
+ backwards" " am" "I" str), even though it doesn’t follow Clojure’s built-in
+ syntax rules, which require an expression’s operand to appear first (not to
+ mention the rule that an expression not be written in reverse order). Without
+ backwards, the expression would fail harder than millennia of alchemists
+ ironically spending their entire lives pursuing an impossible means of achieving
+ immortality. With backwards, you’ve created your own syntax! You’ve extended
+ Clojure so you can write code however you please!
+
+ Non-Lisp languages compile code such as ~1 + 6 * 7~ by parsing it into the AST ~(+
+ 1 (* 6 7))~ which is generally not accessible in the language then invokes the
+ evaluator which simplifies it, say by turning it into machine code. In Lisps,
+ however, both the AST and the evaluator are accessible /within/ the language.
+ - Since ASTs are just Lisp forms, every language contains a copy of a Lisp!
+
+ #+BEGIN_SRC clojure
+(eval '(def woah [1 2 3]))
+woah ;; ⇒ 123
+ #+END_SRC
+
+ The /reader/ takes textual input of characters that denotes an expression
+ and actually recognises it as a valid Clojure expression.
+ The =read-string= function takes a string and returns a valid Clojure expression,
+ if possible.
+
+ #+BEGIN_SRC clojure
+(def my-form (read-string "(+ 1 2)")) ;; ⇒ '(+ 1 2)
+(eval my-form) ;; ⇒ 3
+ #+END_SRC
+
+ + Above, we read ='(+ 1 2)= which is a list having the plus /symbol/ followed by the
+   /symbols/ 1 and 2. There are *no* functions nor *numbers*; just syntactic symbols.
+ + When we *eval*-uate it, the numeric symbols are interpreted as numbers
+   and the cross symbol ‘+’ is interpreted as addition.
+
+ In some sense, when a Lisp file is evaluated, what happens is
+ ~(eval (read-string the-file-contents))~. Neato!
+
+ + Reading and evaluating are independent processes; you can read without
+   evaluating.
+
+ In the following translation, the reader used a /reader macro/, a rule for
+ transforming text, to read an anonymous functional expression as an ~fn~-anonymous
+ function. Reader macros are designated by ~', #, @~; the semicolon ~;~ designates
+ the single-line comment reader macro which causes text to be ignored.
+ #+BEGIN_SRC clojure
+(read-string "#(+ 1 %)") ;; ⇒ '(fn* (p1__6418#) (+ 1 p1__6418#))
+(read-string "'(a b c)") ;; ⇒ '(quote (a b c))
+(read-string "@var")     ;; ⇒ '(clojure.core/deref var)
+(read-string "; bye! \n (+ 1 2)") ;; ⇒ '(+ 1 2)
+ #+END_SRC
+
+ + Use =type= to get the type of a value.
+
+ 1. Non-compound data evaluates to itself.
+     #+BEGIN_SRC clojure
+(def self '(list true 23 {} :justme ()))
+(= (rest self) (eval self)) ;; ⇒ true;; Ignoring the first “list”
+ #+END_SRC
+
+ # hi
+ 2. [@2] Evaluation of function calls ~f~:
+    =(eval '(f a₀ ... aₙ)) = (f (eval 'a₀) ... (eval 'aₙ))=
+
+    /Evaluate all arguments then pass those to the function denotation/.
+
+ 3. Special forms each have their own evaluation rules; e.g.,
+    - [No evaluation] ~(eval '(quote xs)) = (quote xs)~.
+      * The =quote= form tells the evaluator to stop evaluating!
+    - (Conditional evaluation)
+      if ~(eval '(true? c))~ is true, then ~(eval '(if c x y)) = (eval 'x)~ otherwise
+      ~(eval '(if c x y)) = (eval 'y)~.
+    - Rules for ~def, let, loop, fn, do, ...~.
+
+ Macros are AST-to-AST functions; the =defmacro= conveniently handles quoting input
+ and evaluating output ---whereas the /function/ =infix= has to be surrounded by
+ quote and eval explicitly.
+ #+BEGIN_SRC clojure
+;; Clunky way to support infix notation
+(defn infix [[l op r]] (list op l r))
+(eval (infix (quote (1 + 2)))) ;; ⇒ 3; the eval-quote are noisy!
+
+(defmacro ifx [[l op r]] (list op l r))
+(ifx (1 + 2)) ;; ⇒ 3; no noise ^_^
+ #+END_SRC
+
+ The evaluator essentially works as follows for macros =m=:
+ + [Macro Expansion] =(eval '(m a₀ ... aₙ)) = (eval (m 'a₀ ... 'aₙ))=
+
+   Notice that on the right side, =m= is evaluated on /un-evaluated/ arguments ='aᵢ=,
+   which returns an AST, which is then =eval=-uated.  That is, evaluation is
+   deferred to =m= which decides how to stick the syntactic pieces ~'aᵢ~ together,
+   the result of which is then reduced by the evaluator.
+
+   Unlike the function call rule, here the input is /quoted/ and result of the call
+   is /evaluated/.
+
+
+ *Macros enable syntactic abstraction!*
+ ---Indeed, we just wrote a simple way to support infix notation!
+
+ For example, it is common to see forms such as ~(fₙ (fₙ₋₁ (... (f₁ (f₀ e)))))~ that
+ /sequentially/ compute on the starting term =e=.  One can read this as /do fₙ after
+ doing fₙ₋₁ after doing ... after doing f₀ to e/. However, it may be much easier to
+ say /start with e, then do f₀ then do f₁ then ... then do fₙ/ ---this is supported
+ with the built-in “threading macro” as =(-> e f₀ f₁ ... fₙ)= which ‘threads’ =e= and
+ through the functions /fᵢ/.
+
+ Threading pipes data from top-to-bottom which is a bit more natural
+ than piping from inner-parentheses to outer-parentheses.
+
+ TODO: Look-up the Common Lisp infix macro library and mimic that ;-)
+ ---for learning ^_^
+* DONE COMMENT Files
+  :PROPERTIES:
+  :CUSTOM_ID: Files
+  :END:
+
+
+Use the =slurp= function to read a text file as a string.
+#+BEGIN_SRC text :tangle suspects.csv
+Edward Cullen,10
+Bella Swan,0
+Charlie Swan,0
+Jacob Black,3
+Carlisle Cullen,6
+#+END_SRC
+
+#+BEGIN_SRC clojure
+;; Read the file as a list of (lines of) strings.
+;; (clojure.string/split (slurp "suspects.csv") #"\n")
+
+;; Parse a CSV file as a list of {:name ... :index ...} maps
+(require '[clojure.string :as s])
+(defn recordify [[x y]] {:name x :index y})
+(map #(recordify (s/split % #","))
+     (s/split (slurp "suspects.csv") #"\n"))
+#+END_SRC
+
+The =#"\n"= is known as a /regular expression literal/.
+* ELISP COMMENT Reads
+  :PROPERTIES:
+  :CUSTOM_ID: COMMENT-Reads
+  :END:
+
+#+latex: {\color{white}.}\vspace{-1em}
++ [[http://sachachua.com/blog/wp-content/uploads/2013/05/How-to-Learn-Emacs-v2-Large.png][How to Learn Emacs: A Hand-drawn One-pager for Beginners / A visual tutorial]]
++ [[https://emacs-doctor.com/learn-emacs-lisp-in-15-minutes.html][Learn Emacs Lisp in 15 minutes]] --- https://learnxinyminutes.com/
++ [[https://www.gnu.org/software/emacs/manual/html_node/eintr/index.html#Top][An Introduction to Programming in Emacs Lisp]] @@latex: \hfill  ---also @@ [[http://landoflisp.com/][Land of Lisp]]
++ [[https://www.gnu.org/software/emacs/manual/html_node/elisp/index.html#Top][GNU Emacs Lisp Reference Manual]]
+
+* COMMENT spacing COMMENT vfill                                                     :ignore:
+  :PROPERTIES:
+  :CUSTOM_ID: COMMENT-spacing-COMMENT-vfill
+  :END:
+\vfill
+
+* COMMENT ELISP Lists and List-Like Structures
+  :PROPERTIES:
+  :CUSTOM_ID: COMMENT-ELISP-Lists-and-List-Like-Structures
+  :END:
+
++ Produce a syntactic, un-evaluated list, we use the single quote:
+  ~'(1 2 3)~.
+
++ Construction: ~(cons 'x₀ '(x₁ ... xₖ)) → (x₀ x₁ ... xₖ)~.
+
++ Head, or /contents of the address part of the register/:
+   ~(car '(x₀ x₁ ... xₖ)) → x₀~.
+
++ Tail, or /contents of the decrement part of the register/:
+   ~(cdr '(x₀ x₁ ... xₖ)) → (x₁ ... xₖ)~.
+
+# + Deletion: ~(delete e xs)~ yields ~xs~ with all instance of ~e~ removed.
+#  - E.g., ~(delete 1 '(2 1 3 4 1)) → '(2 3 4)~.
+#
+# (describe-symbol 'remove-if-not) ;; “filter” ;-)
+
+E.g., ~(cons 1 (cons "a" (cons 'nice nil))) = (list 1 "a" 'nice) = '(1 "a" nice)~.
+
+#+latex: \room
+Since variables refer to literals and functions have lambdas as literals, we
+can produce forms that take functions as arguments. E.g., the standard ~mapcar~
+may be construed:
+#+BEGIN_SRC clojure
+(defun my-mapcar (f xs)
+  (if (null xs) xs
+   (cons (funcall f (car xs)) (my-mapcar f (cdr xs)))))
+
+(my-mapcar (lambda (x) (* 2 x)) '(0 1 2 3 4 5)) ;; ⇒ (0 2 4 6 8 10)
+(my-mapcar 'upcase '("a" "b" "cat")) ;; ⇒ ("A" "B" "CAT")
+#+END_SRC
+
+Pairs: ~(x . y) = (cons x y)~.
+
+  An association list, or alist, is a list formed of such pairs.
+  They're useful for any changeable collection of key-value pairs.
+  The ~assoc~ function takes a key and an alist and returns the first pair
+  having that key. In the end, alists are just lists.
+
+  :Try_it_out:
+#+BEGIN_SRC clojure
+(setq drinks '( (jasim . coffee) (mary . tea) (jasim . chai) ))
+
+(assoc 'mary drinks) ;; ⇒ (mary . tea)
+(assoc 'jasim drinks) ;; ⇒ (jasim . coffee)
+
+(push '(mary . cola) drinks)
+(assoc 'mary drinks) ;; ⇒ (mary . cola)
+#+END_SRC
+:End:
+
+#+latex: \room
+What if you look up a key and get ~nil~, is there no value for that key or is the value
+~nil~? ~gethash~ takes a final, optional, argument which is the value to return when the
+key is not found; it is ~nil~ by default.
+
+* COMMENT ELISP Generic Setters
+  :PROPERTIES:
+  :CUSTOM_ID: COMMENT-ELISP-Generic-Setters
+  :END:
+
+Since everything is a list in lisp, if ~G~ is a way to get a value from variable ~x~, then ~(setf G e)~ updates ~x~ so that the location ~G~ now refers to element ~e~.
+Hence, once you have a getter ~G~ you freely obtain a setter ~(setf G ...)~.
+# G may be arbitrary complex.
+
+# E.g., ~nth~ is a way to get a value from a list; ~(setf (nth 2 x) 'nice)~ changes the list ~x~ at index ~2~ to have value ~'nice~.
+
+#+BEGIN_SRC clojure
+;; Element update
+(setq x '(0 1 2 3))    ;; x ⇒ '(0 1 2     3)
+(setf (nth 2 x) 'nice) ;; x ⇒ '(0 1 'nice 3)
+
+;; Circular list
+(setq y '(a b c))   ;; y ⇒ '(a b c)
+(setf (cdddr y) y)  ;; y ⇒ '(a b c a b . #2)
+;; “#2” means repeat from index 2.
+(nth 99 y) ;; ⇒ a
+#+END_SRC
+
+* COMMENT ELISP Records
+  :PROPERTIES:
+  :CUSTOM_ID: COMMENT-ELISP-Records
+  :END:
+
+If we want to keep a list of related properties in a list, then we have to remember
+which position keeps track of which item and may write helper functions to keep track
+of this. Instead we could use a structure.
+:More:
+A Lisp "Structure, record, object" represents objects with properties as in OOP.
+Make a structure like this: (defstruct X (f1 d1) (f2 d2) ... (fn dn)), this creates a record type named X with slots/properties/fields fi having defaults di or nil if di is absent in which case we simply write fi rather than (fi di), moreover it gives the generic constructor (make-X :f1 val1 :f2 val2 ... :fn valn) where any of the fi is optional and assigned nil by default; projection functions X.fi are also provided automatically.
+Printing and reading symmetry works as expected with structures and updates happen with setf as expected.
+:End:
+
+#+BEGIN_SRC clojure
+(defstruct X "Record with fields/slots fᵢ having defaults dᵢ"
+  (f₀ d₀) ... (fₖ dₖ))
+
+;; Automatic constructor is “make-X” with keyword parameters for
+;; initialising any subset of the fields!
+;; Hence (expt 2 (1+ k)) kinds of possible constructor combinations!
+(make-X :f₀ val₀ :f₁ val₁ ... :fₖ valₖ) ;; Any, or all, fᵢ may be omitted
+
+;; Automatic runtime predicate for the new type.
+(X-p (make-X)) ;; ⇒ true
+(X-p 'nope)    ;; ⇒ nil
+
+;; Field accessors “X-fᵢ” take an X record and yield its value.
+
+;; Field update: (setf (X-fᵢ x) valᵢ)
+
+(defstruct book
+  title  (year  0))
+
+(setq ladm (make-book :title "Logical Approach to Discrete Math" :year 1993))
+(book-title ladm) ;; ⇒ "Logical Approach to Discrete Math"
+(setf (book-title ladm) "LADM")
+(book-title ladm) ;; ⇒ "LADM"
+#+END_SRC
+
+Advanced OOP constructs can be found within the CLOS, Common Lisp Object System;
+which is also used as a research tool for studying OOP ideas.
+
+* COMMENT ELISP Macros
+  :PROPERTIES:
+  :CUSTOM_ID: COMMENT-ELISP-Macros
+  :END:
+
+  Macros let us add new syntax, like ~let1~ for single lets:
+  #
+  # Need to have a space before using ‘parallel’.
+  #
+#+begin_parallel 2
+     #+BEGIN_SRC clojure
+ ;; Noisy parens!
+ (let ((x "5")) (message x))
+
+ ;; Better.
+ (let1 x "5" (message x))
+
+ ;; How?
+ (defmacro let1 (var val &rest body)
+  `(let ((,var ,val)) ,@body))
+
+ ;; What does it look like?
+ (macroexpand
+   '(let1 x "5" (message x)))
+ ;; ⇒ (let ((x 5)) (message x))
+ #+END_SRC
+   \columnbreak
+     #+BEGIN_SRC clojure
+ ;; No progn; (first x y z) = x
+ (defmacro first (&rest body)
+  (car `,@body))
+
+ ;; Need to use “progn”!
+ (defmacro not-first (&rest body)
+  `(progn ,@(cdr `,@body)))
+
+ (macroexpand '(not-first x y z))
+ ;; `,@body       ⇒ (x y z)
+ ;; (cdr `,@body) ⇒ (y z)
+ ;; `(progn ,@(cdr `,@body))
+ ;;        ⇒ (progn y z)
+#+END_SRC
+
+  :Try_it_out:
+  #+BEGIN_SRC clojure
+  (first (insert "x") (insert "y") (message "z"))
+
+  (not-first (insert "x") (insert "y") (message "z"))
+#+END_SRC
+  :End:
+
+#+end_parallel
+
+  0. Certain problems are elegantly solved specific language constructs;
+     e.g., list operations are generally best defined by pattern matching.
+     # Likewise for any ADT.
+
+  1. Macros let us /make/ the best way to solve a problem when our language does
+     not give it to us.
+
+     # --They can also be used to reduce repetitive visual noise.
+     # Which is achievable by using higher-order operations.
+     #
+     # IMHO macros are best for creating new syntax.
+
+  2.  Macro expansion happens before runtime, function execution, and so the
+      arguments passed to a macro will contain raw source code.
+
+      [[http://www.lispworks.com/documentation/HyperSpec/Body/02_df.htm][Backquotes]] let us use the comma to cause the actual variable /names/
+      and /values/ to be used --e.g., ~x~ is a ‘meta-variable’ and its value, ~,x~,
+      refers to a real variable or value.
+
+      The ~&rest~ marker allows us to have multiple statements at the end of the macro:
+      The macro expander provides all remaining expressions in the macro as a list,
+      the contents of which may be inserted in place, not as a list, using the
+      [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html][ ~,@~ splice comma]]  --we need to ensure there's a ~progn~.
+
+       Use list elements in-place:
+       #+latex: \vspace{-1em}
+       | ~`(pre ,@(list s₀ ... sₙ) post) = `(pre s₀ ... sₙ post)~ |
+       #
+       # This works:  `(pre ,@'(s0 ... sn) post)
+       #             = '(pre s0 ... sn post)
+       #
+       # Woah!
+
++ ~macroexpand~ takes /code/ and expands any macros in it. It's useful in debugging macros.
+  The above ‘equations’ can be checked by running ~macroexpand~; \newline e.g.,
+  ~(when c s₀ ... sₙ) = (if c (progn s₀ ... sₙ) nil)~ holds since:
+
+   #+BEGIN_SRC clojure
+(macroexpand '(when c s₀ ... sₙ)) ;; ⇒ (if c (progn s₀ ... sₙ))
+#+END_SRC
+
++ If ~var~ is an argument to a macro where ~,var~ occurs multiple times, then since
+  arguments to macros are raw source code, each occurrence of ~,var~ is an execution of the
+  code referenced by ~var~.
+
+  #+latex: \room
+  Avoid such repeated execution by using a ~let~ to capture the result, call it ~res~, once
+  and use the ~res~ in each use site.
+
+  #+latex: \room
+  Now we've made use of the name ~res~ and our users cannot use that name correctly.
+  Avoid such /unintended/ capture by using ~gensym~ to provide us with a globally unique
+  name which is bound to a variable, say ~r~, then we bind the result of executing ~var~
+  to the fresh name ~,r~.
+
+  #+latex: \room
+  Whence: ~`(...,var...,var...)~
+    @@latex:\newline{\color{white}.}\hspace{2em}@@
+    ~⇒ (let ((r (gensym))) `(let ((,r ,var)) ...,r...,r...))~.
+
+  #+latex: \room
+  Note that the name ~r~ is outside the backquote; it is part of code that is run
+  at macro expansion time, not runtime. The value of the final ~let~ is then the backquoted
+  matter, which makes /no/ reference to ~r~, but instead makes use of the name it
+  refers to, ~,r~. Neato!
+
+  #+latex: \room
+  Ex., remove repeated execution from ~(defmacro twice (var) `(list ,var ,var))~.
+  :Try_it_out:
+  #+BEGIN_SRC clojure
+(defmacro twice (var)
+  `(list ,var ,var))
+
+(macroexpand '(twice x))
+
+(twice 3)
+(twice (progn (insert "\nwow") 3))
+
+(defmacro duplicate (var)
+  (let1 r (gensym)
+    `(let1 ,r ,var
+       (list ,r ,r)
+    )
+  )
+)
+
+(duplicate 3)
+(duplicate (progn (insert "\nwow") 3))
+#+END_SRC
+  :End:
+
++ Test that you don't have accidentally variable capture by passing in an insert
+   statement and see how many times insertions are made.
+
++ Macros that /intentionally/ use variable capture as a feature, rather than a bug,
+  to provide names available in the macro body are called ‘anaphoric macros’.
+
+  #+latex: \room
+  E.g., ~(split list no yes)~ provides the names ~head, tail~ in the ~yes~ body
+  to refer to the head and tail of the given ~list~, say via a ~let~, but not so in the
+  ~no~ argument for when ~list~ is empty. Whence, elegant pattern matching on lists.
+
+  #+latex: \room
+  Exercise: Define ~split~.
+  :Try_it_out:
+#+BEGIN_SRC clojure
+(defmacro split (list no &rest yes)
+  `(if ,list (let ((head (car ,list)) (tail (cdr ,list))) ,@yes) ,no)
+)
+
+;; Example use
+
+(defun sum (xs) (split xs 0 (+ head (sum tail))))
+
+(sum '(1 2 3 4 5)) ;; ⇒ 15
+#+END_SRC
+:End:
+
+* COMMENT ELISP  ~read~ and ~print~
+  :PROPERTIES:
+  :CUSTOM_ID: COMMENT-ELISP-read-and-print
+  :END:
+
+‘Reading’ means parsing an expression in textual form and producing a lisp object.
+E.g., this is a way to load a lisp file. ‘Printing’ a lisp object mean producing
+a textual representation. These operations, in lisp, are mostly inverse.
+
+#+latex: \room
+The ~read-from-string~ command works just like the ~read~ command, but
+lets us read a lisp object from a string instead of directly from the console.
+
+#+BEGIN_SRC clojure
+(defun sum-two ()
+  (let (fst snd)
+    (setq fst (read))
+    (setq snd (read))
+    (+ (eval fst) (eval snd))
+  )
+)
+
+;; Run (sum-two) with inputs (+ 1 2) and (* 3 4)  ;-)
+#+END_SRC
+
+Lisp makes writing a REPL astonishingly easy: “Loop as follows:
+Print the result of evaluating what is read at the prompt.”
+#+BEGIN_SRC clojure
+(loop (print (eval (read))))  ;; Beautiful ♥‿♥
+#+END_SRC
+
+ + ~loop~ merely loops forever.
+
+ The ~print~ and ~read~ commands work on all kinds of data, such as lists of data
+   structures. Hence, we must use quotes if we want to read a string rather than a
+   symbol, for example.
+
+#+latex: \room
+A major problem with this REPL is that ~eval~ executes any, potentially malicious,
+Lisp command entered by the user. Ideally one checks the read lisp object is
+safe ---say, it is one of some allowable commands--- and only then evaluates it.
+:A_safer_repl:
+#+BEGIN_SRC clojure
+(defun f () (message-box "f was called"))
+(defun g () (message-box "g was called"))
+(defun h () (message-box "h was called"))
+(setq safe-commands '(f g h))
+
+;; This reply can only execute: (f), (g), (h), quit
+(catch 'quit
+(loop
+  (let ((sexp (read)))
+    (when (equal sexp 'quit) (throw 'quit "byebye"))
+    (if (member (car sexp) safe-commands)
+    (eval sexp)
+    '(I do not know that command)))))
+#+END_SRC
+:End:
+
+* COMMENT Making README.md
+  :PROPERTIES:
+  :CUSTOM_ID: COMMENT-Making-README-md
+  :END:
+
+C-c C-c: Evaluate src block.
+
+#+NAME: make-readme
+#+BEGIN_SRC clojure :results none
+(with-temp-buffer
+    (insert
+    "#+EXPORT_FILE_NAME: README.md
+     ,#+HTML: <h1> ClojureCheatSheet </h1>
+     ,#+OPTIONS: toc:nil d:nil
+     # Toc is displayed below at a strategic position.
+
+     Quick reference to the basics of Clojure
+
+     ◈ [[https://alhassy.github.io/ClojureCheatSheet/][Website]] ◈
+
+     ,*The listing sheet, as PDF, can be found
+     [here](https://alhassy.github.io/ClojureCheatSheet/CheatSheet.pdf)*,
+     while below is an unruly html rendition.
+
+     This reference sheet is built around
+     [[https://github.com/alhassy/CheatSheet][an Org-mode CheatSheet system]].
+
+     ,#+TOC: headlines 2
+     ,#+INCLUDE: CheatSheet.org
+    ")
+    ;; (set-visited-file-name "ReadIt2.md")
+    (org-mode)
+    (org-md-export-to-markdown))
+#+END_SRC
