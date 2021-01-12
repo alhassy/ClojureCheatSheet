@@ -2,7 +2,7 @@
 
 Quick reference to the basics of Clojure
 
-◈ [Website](https://alhassy.github.io/ClojureCheatSheet/) ◈
+◈ [Website](https://alhassy.github.io/ClojureCheatSheet/index.html) ◈
 
 **The listing sheet, as PDF, can be found
 [here](<https://alhassy.github.io/ClojureCheatSheet/CheatSheet.pdf>)**,
